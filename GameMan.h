@@ -3,8 +3,6 @@
 #include <vector>
 #include "Texture.h"
 
-
-
 /*
 Game Manager class. Purpose is to handle switching between game states 
 

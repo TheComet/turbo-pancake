@@ -3,24 +3,21 @@
 #include <SDL.h>
 #include "Globals.h"
 #include <iostream>
+#include <memory>
+
+
 
 
 //Texture wrapper class
 //Based off of http://lazyfoo.net/ tutorials w/ some modifications
 class Texture {
-	SDL_Texture* mTexture;
+	std::shared_ptr<SDL_Texture> mTexture;
 	int width;
 	int height;
 
 	void free(); //properly deallocate mTexture
 public:
 	Texture();
-
-    //copy ctor
-    Texture(const Texture& arg);
-    // Overloading of Assignment Operator
-    void operator=(const Texture& arg);
-
 	~Texture();	
 
 	bool load(std::string path);
@@ -45,3 +42,6 @@ public:
 	int getWidth();
 	int getHeight();
 };
+
+Texture loadTexture(std::string filename);
+Texture textTexture(std::string text, SDL_Color c);

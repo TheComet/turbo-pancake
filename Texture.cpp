@@ -4,39 +4,25 @@
 #include <string>
 using namespace std;
 
-Texture::Texture() : mTexture(NULL), width(0), height(0) {}
-Texture::~Texture() { free(); }
-//copy ctor
-Texture::Texture(const Texture& arg) : mTexture(NULL),width(0),height(0) {
-    if (arg.mTexture!=NULL) {
-        cout<<"Error! Copy constructor called on non-null Texture! Creating new null texture instead." <<endl;
-    }
-}
-// Overloading of Assignment Operator
-void Texture::operator=(const Texture& arg) {
-    if (arg.mTexture!=NULL) {
-        cout<<"Error! Assignment operator called on non-null Texture! Creating new null texture instead." <<endl;
-    }
-    free();
-}
+Texture::Texture() : mTexture(nullptr), width(0), height(0) {}
+Texture::~Texture() { }
+
+
 
 bool Texture::load(string path) {
-	//Get rid of preexisting texture
-	free();
-
 	//The final texture
-	SDL_Texture* newTexture = NULL;
+	SDL_Texture* newTexture = nullptr;
 
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL) {
+	if (loadedSurface == nullptr) {
 		cout<<"Unable to load image "<<path<<"! "<<IMG_GetError()<<endl;
         return false;
 	}
 
 	//Create texture from surface pixels
 	newTexture = SDL_CreateTextureFromSurface(g.renderer, loadedSurface);
-	if (newTexture == NULL) {
+	if (newTexture == nullptr) {
         cout<<"Unable to create texture from "<<path<<"! "<<SDL_GetError()<<endl;
         return false;
 	}
@@ -49,7 +35,7 @@ bool Texture::load(string path) {
 	SDL_FreeSurface(loadedSurface);
 
     //save texture ptr
-	mTexture = newTexture;
+	mTexture = std::shared_ptr<SDL_Texture>(newTexture, SDL_DestroyTexture);
 
     //Return success
 	return true;
@@ -61,14 +47,14 @@ bool Texture::text(std::string textureText, SDL_Color textColor) {
 
 	//Render text surface
 	SDL_Surface* textSurface = TTF_RenderText_Solid(g.font16, textureText.c_str(), textColor);
-	if (textSurface == NULL) {
+	if (textSurface == nullptr) {
 		cout<<"Unable to render text surface! "<<TTF_GetError()<<endl;
         return false;
 	}
 
 	//Create texture from surface pixels
-	mTexture = SDL_CreateTextureFromSurface(g.renderer, textSurface);
-	if (mTexture == NULL) {
+	mTexture =std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(g.renderer, textSurface),SDL_DestroyTexture);
+	if (mTexture == nullptr) {
         cout<<"Unable to create texture from rendered text! "<<SDL_GetError()<<endl;
         return false;
 	}
@@ -84,25 +70,21 @@ bool Texture::text(std::string textureText, SDL_Color textColor) {
 }
 
 void Texture::free() {
-	//Free texture if it exists
-	if (mTexture != NULL)
-		SDL_DestroyTexture(mTexture);
-	
-    mTexture = NULL;
+    mTexture = nullptr;
     width = 0;
     height = 0;
 }
 
 void Texture::setColor(Uint8 red, Uint8 green, Uint8 blue) {
-	SDL_SetTextureColorMod(mTexture, red, green, blue);
+	SDL_SetTextureColorMod(mTexture.get(), red, green, blue);
 }
 
 void Texture::setBlendMode(SDL_BlendMode blending) {
-	SDL_SetTextureBlendMode(mTexture, blending);
+	SDL_SetTextureBlendMode(mTexture.get(), blending);
 }
 
 void Texture::setAlpha(Uint8 alpha) {
-	SDL_SetTextureAlphaMod(mTexture, alpha);
+	SDL_SetTextureAlphaMod(mTexture.get(), alpha);
 }
 
 void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip) {
@@ -116,7 +98,7 @@ void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cent
 	}
 
 	//Render to screen
-	SDL_RenderCopyEx(g.renderer, mTexture, clip, &renderQuad, angle, center, flip);
+	SDL_RenderCopyEx(g.renderer, mTexture.get(), clip, &renderQuad, angle, center, flip);
 }
 
 int Texture::getWidth() {
@@ -125,4 +107,15 @@ int Texture::getWidth() {
 
 int Texture::getHeight() {
 	return height;
+}
+
+Texture loadTexture(std::string filename){
+	Texture t;
+	t.load(filename);
+	return t;
+}
+Texture textTexture(std::string text, SDL_Color c){
+	Texture t;
+	t.text(text, c);
+	return t;
 }

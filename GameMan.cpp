@@ -43,16 +43,11 @@ void GameMan::drawButtonPressed() {
 void GameMan::initialize() {
     pressedbutton.load("buttonpressed.png");
     unpressedbutton.load("buttonunpressed.png");
-    texts.push_back(Texture());
-    texts.push_back(Texture());
-    texts.push_back(Texture());
-    texts.push_back(Texture());
-    texts.push_back(Texture());
-    texts[0].text("noot.",{0, 0, 0});
-    texts[1].text("Noot",{0, 0, 0});
-    texts[2].text("NOOT",{0, 0, 0});
-    texts[3].text("noot!",{0, 0, 0});
-    texts[4].text("noot",{0, 0, 0});
+	texts.push_back(textTexture("noot.", { 0, 0, 0 }));
+	texts.push_back(textTexture("Noot", { 0, 0, 0 }));
+	texts.push_back(textTexture("NOOT", { 0, 0, 0 }));
+	texts.push_back(textTexture("noot!", { 0, 0, 0 }));
+	texts.push_back(textTexture("noot", { 0, 0, 0 }));
     for (int i=0;i<40;i++) {
         x.push_back(rand()%g.scWidth);
         y.push_back(rand()%g.scHeight);
@@ -64,7 +59,7 @@ void GameMan::timestep(double dt) {
     if (state==1) {
         for (size_t i=0;i<x.size();i++) {
             x[i]=fmod(50*dt+x[i],g.scWidth);
-            y[i]=fmod(200*dt+y[i],g.scWidth);
+            y[i]=fmod(200*dt+y[i],g.scHeight);
         }
     }
 }
