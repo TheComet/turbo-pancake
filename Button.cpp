@@ -23,6 +23,8 @@ void Button::handleEvent(SDL_Event* e) {
 		else if (e->type == SDL_MOUSEBUTTONDOWN)
 			primed = true;
 	}
+	else
+		primed = false;
 }
 
 bool Button::isPressed() {
