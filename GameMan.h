@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include <vector>
 #include "Texture.h"
+#include "Button.h"
 
 /*
 Game Manager class. Purpose is to handle switching between game states 
@@ -16,14 +17,10 @@ class GameMan {
 
     Texture pressedbutton;
     Texture unpressedbutton;
+	std::vector<Button> buttons;
     std::vector<double> x;
     std::vector<double> y;
     std::vector<Texture> texts;
-
-    void drawButtonUnpressed();
-    void drawButtonPressed();
-
-    bool mouseIsOverButton();
 
 
 public:
