@@ -6,10 +6,11 @@ class Button
 {
 	Texture pressedTexture, unpressedTexture;
 	int xpos, ypos;
-	bool clicked;
+	bool clicked; //successful "expected" click on button
+	bool primed; //variable checking if cursor goes down on button initially
 
 public:
-	Button(int x, int y, Texture ptexture, Texture utexture) : pressedTexture(Texture()), unpressedTexture(Texture()), clicked(false)  {
+	Button(int x, int y, Texture ptexture, Texture utexture) : pressedTexture(Texture()), unpressedTexture(Texture()), clicked(false), primed(false)  {
 		xpos = x;
 		ypos = y;
 		pressedTexture = ptexture;
@@ -19,9 +20,8 @@ public:
 	~Button() {}
 
 	bool mouseIsOverButton();
-	/*void drawButtonPressed();
-	void drawButtonUnpressed(); */
 	void render();
 	void handleEvent(SDL_Event* e);
 	bool isPressed();
+	void pressReceived();
 };

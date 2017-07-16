@@ -1,18 +1,11 @@
 #include "Button.h"
-
+#include <iostream>
 
 bool Button::mouseIsOverButton() {
-	int mx, my, cx = g.scWidth / 2, cy = g.scHeight / 2, w = unpressedTexture.getWidth(), h = unpressedTexture.getHeight();
+	int mx, my, w = unpressedTexture.getWidth(), h = unpressedTexture.getHeight();
 	SDL_GetMouseState(&mx, &my);
-	return mx>cx - w / 2 && mx<cx + w / 2 && my<cy + h / 2 && my>cy - h / 2;
-}/*
-void Button::drawButtonUnpressed() {
-	unpressedTexture.render(xpos, ypos);
+	return mx > xpos && mx < xpos + w && my < ypos + h && my > ypos;
 }
-
-void Button::drawButtonPressed() {
-	pressedTexture.render(xpos, ypos);
-} */
 
 void Button::render() {
 	if (mouseIsOverButton())
@@ -22,12 +15,20 @@ void Button::render() {
 }
 
 void Button::handleEvent(SDL_Event* e) {
-	if (e->type == SDL_MOUSEBUTTONUP && mouseIsOverButton())
-		clicked = true;
+	if (mouseIsOverButton()) {
+		if (e->type == SDL_MOUSEBUTTONUP && primed) {
+			primed = false;
+			clicked = true;
+		}
+		else if (e->type == SDL_MOUSEBUTTONDOWN)
+			primed = true;
+	}
 }
 
 bool Button::isPressed() {
-	bool temp = clicked;
+	return clicked;
+}
+
+void Button::pressReceived() {
 	clicked = false;
-	return temp;
 }
