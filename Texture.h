@@ -18,13 +18,12 @@ class Texture {
 	void free(); //properly deallocate mTexture
 public:
 	Texture();
-	~Texture();	
 
 	bool load(std::string path);
-    //color keying options possible: ,bool colorKey=false,Uint8 r=0,Uint8 g=0xFF,Uint8 b=0xFF
 
 	//Use SDL_ttf 2.0 to render text to a texture. 
 	bool text(std::string textureText, SDL_Color textColor);
+
     //Use SDL_ttf 2.0 to render text to a texture. 
     bool text(std::string textureText,SDL_Color textColor, TTF_Font *font);
 

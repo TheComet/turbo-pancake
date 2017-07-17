@@ -68,15 +68,6 @@ bool init() {
 		cout<<"SDL_ttf could not initialize! "<<TTF_GetError()<<endl;
         return false;
 	}
-
-	//Initialize SDL_mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-	{
-		printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
-		return false;
-	}
-    
-
     //Open the font
     g.font16 = TTF_OpenFont("media/Vera.ttf",16);
     if (g.font16==NULL) {
@@ -93,6 +84,16 @@ bool init() {
         cout<<TTF_GetError()<<endl;
         return false;
     }
+
+
+    //Initialize SDL_mixer
+    if (Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048) < 0) {
+        cout<<"SDL_mixer could not initialize! "<<Mix_GetError()<<endl;
+        return false;
+    }
+    //load main button sounds
+    g.defaultClickSound=Sound();
+    g.defaultClickSound.load("media/audio/knifeSlice.ogg");
 
 	return true;
 }
@@ -117,15 +118,6 @@ void close() {
     SDL_Quit();
 }
 
-/*
-Texture text;
-//Render text
-SDL_Color textColor ={0, 0, 0};
-text.text("The quick brown fox jumps over the lazy dog",textColor);
-
-        //Render current frame
-        text.render((g.scWidth - text.getWidth()) / 2,(g.scHeight - text.getHeight()) / 2);
-*/
 int main(int argc,char* args[]) {
 
     srand(time(NULL));
@@ -135,42 +127,45 @@ int main(int argc,char* args[]) {
         return 1;
     }
 
-    GameMan game;
-    game.initialize();
 
-    Uint32 lasttime = SDL_GetTicks();
-    
+    {
+        //Adding a block here forces GameMan to deallocate BEFORE close is called. 
+        //So all the textures/sounds get destructed, and THEN we call Mix_Quit. 
+        GameMan game;
+        game.initialize();
 
-    //main loop
-    while (!g.quit) {
-        //Handle events on queue
-        SDL_Event e;
-        while (SDL_PollEvent(&e) != 0) {
-            //User requests quit
-            if (e.type == SDL_QUIT) {
-                g.quit = true;
-            } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym==SDLK_ESCAPE)
-                    g.quit=true;
+        Uint32 lasttime = SDL_GetTicks();
+
+        //main loop
+        while (!g.quit) {
+            //Handle events on queue
+            SDL_Event e;
+            while (SDL_PollEvent(&e) != 0) {
+                //User requests quit
+                if (e.type == SDL_QUIT) {
+                    g.quit = true;
+                }
+                else if (e.type == SDL_KEYDOWN) {
+                    if (e.key.keysym.sym==SDLK_ESCAPE)
+                        g.quit=true;
+                }
+                game.handleEvent(&e);
             }
-            game.handleEvent(&e);
+
+            Uint32 newtime= SDL_GetTicks();
+            game.timestep((newtime-lasttime)*0.001);
+            lasttime=newtime;
+
+            //Clear screen
+            SDL_SetRenderDrawColor(g.renderer,0xFF,0xFF,0xFF,0xFF);
+            SDL_RenderClear(g.renderer);
+
+            game.render();
+
+            //Update screen
+            SDL_RenderPresent(g.renderer);
         }
-
-        Uint32 newtime= SDL_GetTicks();
-        game.timestep((newtime-lasttime)*0.001);
-        lasttime=newtime;
-
-        //Clear screen
-        SDL_SetRenderDrawColor(g.renderer,0xFF,0xFF,0xFF,0xFF);
-        SDL_RenderClear(g.renderer);
-
-        game.render();
-
-        //Update screen
-        SDL_RenderPresent(g.renderer);
     }
-
-
     close();
 
     return 0;

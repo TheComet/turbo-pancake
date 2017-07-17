@@ -1,17 +1,20 @@
 #include "Button.h"
 #include <iostream>
+#include "Globals.h"
 
+Button::Button() : pressedTexture(),unpressedTexture(),text(),textshadow(),xpos(0),ypos(0),clicked(false),primed(false),deltay(0),soundEffect() { }
 
-Button::Button() : pressedTexture(),unpressedTexture(),text(),textshadow(),xpos(0),ypos(0),clicked(false),primed(false),deltay(0),soundEffect(NULL) { }
-
-Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textstr, Mix_Chunk *sound) : 
+//Initialize the button. x and y are the coordinates of the top left of the button texture.
+//If text is left to "", no text will be displayed over the button.
+//This initializer will set the click sound to g.defaultClickSound. 
+Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textstr) : 
     pressedTexture(ptexture),
     unpressedTexture(utexture),text(),textshadow(),
     xpos(x),
     ypos(y),
     clicked(false),
     primed(false),
-	soundEffect(sound) {
+	soundEffect(g.defaultClickSound) {
     deltay=unpressedTexture.getHeight()-pressedTexture.getHeight();
 
     if (textstr.length()>0) {
@@ -20,6 +23,23 @@ Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textst
     }
 }
 
+//Initialize the button. x and y are the coordinates of the top left of the button texture.
+//This initializer will set the click sound to the argument. If the argument is the empty sound Sound(), the button will be silent. 
+Button::Button(int x,int y,Texture ptexture,Texture utexture,std::string textstr,Sound clicksound) :
+    pressedTexture(ptexture),
+    unpressedTexture(utexture),text(),textshadow(),
+    xpos(x),
+    ypos(y),
+    clicked(false),
+    primed(false),
+    soundEffect(clicksound) {
+    deltay=unpressedTexture.getHeight()-pressedTexture.getHeight();
+
+    if (textstr.length()>0) {
+        text=textTexture(textstr,{211,191,143},g.font16bold);
+        textshadow=textTexture(textstr,{98,83,73},g.font16bold);
+    }
+}
 
 bool Button::mouseIsOverButton() {
 	int mx, my, w = unpressedTexture.getWidth(), h = unpressedTexture.getHeight();
@@ -59,8 +79,7 @@ void Button::handleEvent(SDL_Event* e) {
 
 void Button::playSound() {
 	//-1 selects nearest available channel, 0 repeats the sound 0 times
-	if (soundEffect)
-		Mix_PlayChannel(-1, soundEffect, 0);
+    soundEffect.play();
 }
 
 bool Button::isPressed() {

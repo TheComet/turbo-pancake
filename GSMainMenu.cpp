@@ -11,15 +11,7 @@ int GSMainMenu::getStateChange() {
 
 void GSMainMenu::initialize() {
 
-	//load background sound
-	g.music = new BackgroundSound("media/audio/Wacky Waiting.ogg");
-	
-	//load main button sounds
-	buttonSound = Mix_LoadWAV("media/audio/knifeSlice.ogg");
-	if (buttonSound == NULL)
-	{
-		printf("Failed to load button sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-	}
+    menumusic.load("media/audio/Wacky Waiting.ogg");
 
     //Initialize and position the main screen buttons
     Texture p=loadTexture("media/buttonLong_brown_pressed.png");
@@ -27,9 +19,9 @@ void GSMainMenu::initialize() {
     int x=g.scWidth / 2 - p.getWidth()/2;
     int y0=100;
     int dy=p.getHeight()+30;
-    arena=Button(x,y0,p,up,"Arena!",buttonSound);
-    options=Button(x,y0+dy,p,up,"Options!!",buttonSound);
-    noot=Button(x,y0+2*dy,p,up,"NOOT?!1",buttonSound);
+    arena=Button(x,y0,p,up,"Arena!");
+    options=Button(x,y0+dy,p,up,"Options!!");
+    noot=Button(x,y0+2*dy,p,up,"NOOT?!1");
 
     //Load the main screen image
     backgroundimage=loadTexture("media/mainscreen.png");
@@ -38,65 +30,63 @@ void GSMainMenu::initialize() {
 //Timestep. Calls timestep on the current active game state.
 void GSMainMenu::timestep(double dt) { 
     if (transitionstate==0) {
-
+        //Fade in music if it's not already playing
+        if (!menumusic.playing()) {
+            menumusic.fadeIn();
+        }
     } else if (transitionstate==1) {
-        if (noot.isPressed()) {
-            stateChange=3;
-            noot.pressReceived();
+        //Fade in music if it's not already playing
+        if (!menumusic.playing()) {
+            menumusic.fadeIn();
         }
 
+        //If noot button is pressed, fade out music and signal that we should have a state change
+        if (noot.isPressed()) {
+            stateChange=3;
+            menumusic.fadeOut();
+            noot.pressReceived();
+        }
     } else if (transitionstate==2) {
+
 		if (SDL_GetTicks() - transitionstarttime > transitionduration) {
 			transitionstate = 3;
-			//stop global sound, stop + free this menu's button sounds
-			Mix_FreeChunk(buttonSound);
-			buttonSound = NULL;
-			g.music->changeSong("media/audio/Mission Plausible.ogg");
 		}
-
     }
 }
 void GSMainMenu::render() {
-    if (transitionstate==0) {
-        double t=double(SDL_GetTicks()-transitionstarttime)/transitionduration;
-        t=1-t; //if we're fading in, play the same thing as for transitionstate==2 but in reverse.
-        
-        double ytrans=g.scHeight;
-        if (t>0.1)
-            backgroundimage.setAlpha(floor(255*(1-(t-0.1)/0.9)));
-        backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
+    if (transitionstate==1) {
+        //4 things: render background image, and the three buttons.
 
+        backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
+        arena.render();
+        options.render();
+        noot.render();
+
+    } else if (transitionstate==2) { 
+        //Play the fading out animation
+        //Same goal (render 4 things) but with a bunch of positions/transparencies varying over time.
+
+        double t=double(SDL_GetTicks()-transitionstarttime)/transitionduration;
+
+        //Some variables to ease calculation.
+        double ytrans=g.scHeight;
+        //Some variables pulled straight from initialize()
         int x=g.scWidth / 2 - arena.getUnpressedTexture().getWidth()/2;
         int y0=100;
         int dy=arena.getUnpressedTexture().getHeight()+30;
-        /* arena=Button(x,y0,p,up,"Arena!");
-        options=Button(x,y0+dy,p,up,"Options!!");
-        noot=Button(x,y0+2*dy,p,up,"NOOT?!1"); */
-        t=2*t*t-t; // nice looking animation function.
-        arena.setPos(x,y0-t*ytrans);
-        arena.render();
-        options.setPos(x,y0+dy-t*ytrans);
-        options.render();
-        noot.setPos(x,y0+2*dy-t*ytrans);
-        noot.render();
-    } else if (transitionstate==1) {
-        backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
-        arena.render();
-        options.render();
-        noot.render();
-    } else if (transitionstate==2) {
-        double t=double(SDL_GetTicks()-transitionstarttime)/transitionduration;
-        double ytrans=g.scHeight;
+
+        //Draw the background button
         if(t>0.1)
             backgroundimage.setAlpha(floor(255*(1-(t-0.1)/0.9)));
         backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
 
-        int x=g.scWidth / 2 - arena.getUnpressedTexture().getWidth()/2;
-        int y0=100;
-        int dy=arena.getUnpressedTexture().getHeight()+30;
-        /* arena=Button(x,y0,p,up,"Arena!");
+        /* 
+        In initialize, we call the following:
+        arena=Button(x,y0,p,up,"Arena!");
         options=Button(x,y0+dy,p,up,"Options!!");
-        noot=Button(x,y0+2*dy,p,up,"NOOT?!1"); */
+        noot=Button(x,y0+2*dy,p,up,"NOOT?!1"); 
+        do the same thing here, but at position - t*ytrans.
+        */
         t=2*t*t-t; // nice looking animation function.
         arena.setPos(x,y0-t*ytrans);
         arena.render();
@@ -104,7 +94,39 @@ void GSMainMenu::render() {
         options.render();
         noot.setPos(x,y0+2*dy-t*ytrans);
         noot.render();
+    } else if (transitionstate==0) {
+        //Play the fading in animation
+        //Same goal (render 4 things) but with a bunch of positions/transparencies varying over time.
 
+        double t=double(SDL_GetTicks()-transitionstarttime)/transitionduration;
+        t=1-t; //if we're fading in, play the same thing as for transitionstate==2 but in reverse.
+
+               //Some variables to ease calculation.
+        double ytrans=g.scHeight;
+        //Some variables pulled straight from initialize()
+        int x=g.scWidth / 2 - arena.getUnpressedTexture().getWidth()/2;
+        int y0=100;
+        int dy=arena.getUnpressedTexture().getHeight()+30;
+
+        //Draw the background button
+        if (t>0.1)
+            backgroundimage.setAlpha(floor(255*(1-(t-0.1)/0.9)));
+        backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
+
+        /*
+        In initialize, we call the following:
+        arena=Button(x,y0,p,up,"Arena!");
+        options=Button(x,y0+dy,p,up,"Options!!");
+        noot=Button(x,y0+2*dy,p,up,"NOOT?!1");
+        do the same thing here, but at position - t*ytrans.
+        */
+        t=2*t*t-t; // nice looking animation function.
+        arena.setPos(x,y0-t*ytrans);
+        arena.render();
+        options.setPos(x,y0+dy-t*ytrans);
+        options.render();
+        noot.setPos(x,y0+2*dy-t*ytrans);
+        noot.render();
     }
 }
 

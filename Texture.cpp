@@ -5,7 +5,6 @@
 using namespace std;
 
 Texture::Texture() : mTexture(nullptr), width(0), height(0) {}
-Texture::~Texture() { }
 
 
 

@@ -3,7 +3,7 @@
 #include "SDL_ttf.h"
 #include "SDL_mixer.h"
 #include <iostream>
-#include "BackgroundSound.h"
+#include "Sound.h"
 
 //Just so we can make the globals super explicit (and call them as g.renderer, g.font, etc.) 
 struct Globals {
@@ -13,8 +13,8 @@ struct Globals {
 	TTF_Font *font16;
     TTF_Font *font28;
     TTF_Font *font16bold;
+    Sound defaultClickSound;
 
-	BackgroundSound *music;
 
     bool quit; //false is keep running, true is "quit asap".
 

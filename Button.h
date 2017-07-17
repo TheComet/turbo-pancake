@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Texture.h"
+#include "Sound.h"
 
 class Button
 {
@@ -10,8 +11,8 @@ class Button
 	bool primed; //variable checking if cursor goes down on button initially
 
     int deltay; //change in height upon hover. Default is utexture.height()-ptexture.height(). Used to align the bottoms of the buttons after hovering.
-
-	Mix_Chunk *soundEffect; //sound to be played on click
+    
+    Sound soundEffect; //sound to be played on click
 
     bool mouseIsOverButton();
 
@@ -20,8 +21,14 @@ public:
     Button();
 
     //Initialize the button. x and y are the coordinates of the top left of the button texture.
-	Button(int x, int y, Texture ptexture, Texture utexture, std::string text = "", Mix_Chunk *sound = NULL);
+    //If text is left to "", no text will be displayed over the button.
+    //This initializer will set the click sound to g.defaultClickSound. 
+	Button(int x, int y, Texture ptexture, Texture utexture, std::string text = "");
 
+    //Initialize the button. x and y are the coordinates of the top left of the button texture.
+    //This initializer will set the click sound to the argument. If the argument is the empty sound Sound(), the button will be silent. 
+    Button(int x,int y,Texture ptexture,Texture utexture,std::string text ,Sound clicksound);
+    
     //Setters
     void setPos(int x,int y);
     void setdeltay(int dy);

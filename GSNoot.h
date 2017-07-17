@@ -5,15 +5,16 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include "Button.h"
-#include "BackgroundSound.h"
+#include "Sound.h"
 
 class GSNoot
 {
     Button back;
-	Mix_Chunk *backSound;
     std::vector<double> x;
     std::vector<double> y;
     std::vector<Texture> texts;
+
+    Music nootmusic;
 
     int stateChange; //0 is not transitioning, 1 is going to main menu.
 public:
