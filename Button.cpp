@@ -2,15 +2,16 @@
 #include <iostream>
 
 
-Button::Button() : pressedTexture(),unpressedTexture(),text(),textshadow(),xpos(0),ypos(0),clicked(false),primed(false),deltay(0) { }
+Button::Button() : pressedTexture(),unpressedTexture(),text(),textshadow(),xpos(0),ypos(0),clicked(false),primed(false),deltay(0),soundEffect(NULL) { }
 
-Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textstr) : 
+Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textstr, Mix_Chunk *sound) : 
     pressedTexture(ptexture),
     unpressedTexture(utexture),text(),textshadow(),
     xpos(x),
     ypos(y),
     clicked(false),
-    primed(false) {
+    primed(false),
+	soundEffect(sound) {
     deltay=unpressedTexture.getHeight()-pressedTexture.getHeight();
 
     if (textstr.length()>0) {
@@ -18,6 +19,7 @@ Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textst
         textshadow=textTexture(textstr,{98,83,73},g.font16bold);
     }
 }
+
 
 bool Button::mouseIsOverButton() {
 	int mx, my, w = unpressedTexture.getWidth(), h = unpressedTexture.getHeight();
@@ -46,12 +48,19 @@ void Button::handleEvent(SDL_Event* e) {
 		if (e->type == SDL_MOUSEBUTTONUP && primed) {
 			primed = false;
 			clicked = true;
+			playSound();
 		}
 		else if (e->type == SDL_MOUSEBUTTONDOWN)
 			primed = true;
 	}
 	else
 		primed = false;
+}
+
+void Button::playSound() {
+	//-1 selects nearest available channel, 0 repeats the sound 0 times
+	if (soundEffect)
+		Mix_PlayChannel(-1, soundEffect, 0);
 }
 
 bool Button::isPressed() {
@@ -69,6 +78,7 @@ void Button::setPos(int x, int y) {
 void Button::setdeltay(int dy) {
     deltay=dy;
 }
+
 
 void Button::setAlpha(Uint8 alpha) {
     if (!unpressedTexture.isNull())

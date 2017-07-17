@@ -1,5 +1,7 @@
 #pragma once
 #include "Button.h"
+#include "BackgroundSound.h"
+
 class GSMainMenu
 {
     //Main menu options
@@ -8,6 +10,9 @@ class GSMainMenu
     Button noot;
 
     Texture backgroundimage;
+
+	//The sound effects that will be used
+	Mix_Chunk *buttonSound;
 
     //Variables used in a transition/fade out animation
     //state 0 is fading in, state 1 is steady displaying, state 2 is fading out, state 3 is invisible.

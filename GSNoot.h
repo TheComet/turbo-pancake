@@ -5,10 +5,12 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include "Button.h"
+#include "BackgroundSound.h"
 
 class GSNoot
 {
     Button back;
+	Mix_Chunk *backSound;
     std::vector<double> x;
     std::vector<double> y;
     std::vector<Texture> texts;

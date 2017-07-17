@@ -11,15 +11,25 @@ int GSMainMenu::getStateChange() {
 
 void GSMainMenu::initialize() {
 
+	//load background sound
+	g.music = new BackgroundSound("media/audio/Wacky Waiting.ogg");
+	
+	//load main button sounds
+	buttonSound = Mix_LoadWAV("media/audio/knifeSlice.ogg");
+	if (buttonSound == NULL)
+	{
+		printf("Failed to load button sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+	}
+
     //Initialize and position the main screen buttons
     Texture p=loadTexture("media/buttonLong_brown_pressed.png");
     Texture up=loadTexture("media/buttonLong_brown.png");
     int x=g.scWidth / 2 - p.getWidth()/2;
     int y0=100;
     int dy=p.getHeight()+30;
-    arena=Button(x,y0,p,up,"Arena!");
-    options=Button(x,y0+dy,p,up,"Options!!");
-    noot=Button(x,y0+2*dy,p,up,"NOOT?!1");
+    arena=Button(x,y0,p,up,"Arena!",buttonSound);
+    options=Button(x,y0+dy,p,up,"Options!!",buttonSound);
+    noot=Button(x,y0+2*dy,p,up,"NOOT?!1",buttonSound);
 
     //Load the main screen image
     backgroundimage=loadTexture("media/mainscreen.png");
@@ -36,8 +46,13 @@ void GSMainMenu::timestep(double dt) {
         }
 
     } else if (transitionstate==2) {
-        if (SDL_GetTicks()-transitionstarttime > transitionduration)
-            transitionstate=3;
+		if (SDL_GetTicks() - transitionstarttime > transitionduration) {
+			transitionstate = 3;
+			//stop global sound, stop + free this menu's button sounds
+			Mix_FreeChunk(buttonSound);
+			buttonSound = NULL;
+			g.music->changeSong("media/audio/Mission Plausible.ogg");
+		}
 
     }
 }

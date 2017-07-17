@@ -8,6 +8,7 @@
 #include <string>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <SDL_mixer.h>
 
 using namespace std;
 Globals g;
@@ -22,6 +23,13 @@ bool init() {
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cout<<"SDL could not initialize! "<<SDL_GetError()<<endl;
+		return false;
+	}
+
+	//Initialize audio
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+	{
+		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
 		return false;
 	}
 
@@ -60,6 +68,13 @@ bool init() {
 		cout<<"SDL_ttf could not initialize! "<<TTF_GetError()<<endl;
         return false;
 	}
+
+	//Initialize SDL_mixer
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+		return false;
+	}
     
 
     //Open the font
@@ -96,6 +111,7 @@ void close() {
     g.renderer = NULL;
 
     //Quit SDL subsystems
+	Mix_Quit();
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();

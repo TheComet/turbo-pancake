@@ -11,6 +11,8 @@ class Button
 
     int deltay; //change in height upon hover. Default is utexture.height()-ptexture.height(). Used to align the bottoms of the buttons after hovering.
 
+	Mix_Chunk *soundEffect; //sound to be played on click
+
     bool mouseIsOverButton();
 
 public:
@@ -18,7 +20,7 @@ public:
     Button();
 
     //Initialize the button. x and y are the coordinates of the top left of the button texture.
-    Button(int x,int y,Texture ptexture,Texture utexture,std::string text="");
+	Button(int x, int y, Texture ptexture, Texture utexture, std::string text = "", Mix_Chunk *sound = NULL);
 
     //Setters
     void setPos(int x,int y);
@@ -33,6 +35,8 @@ public:
     //Clicky logic
 	bool isPressed();
 	void pressReceived();
+
+	void playSound();
 
     Texture & getUnpressedTexture();
 };

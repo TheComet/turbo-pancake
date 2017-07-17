@@ -9,9 +9,15 @@ int GSNoot::getStateChange() {
 
 void GSNoot::initialize() {
     //Initialize and position the main screen buttons
+	//load back button sounds
+	backSound = Mix_LoadWAV("media/audio/iCannotDoThat.ogg");
+	if (backSound == NULL)
+	{
+		printf("Failed to load back button sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+	}
     Texture p=loadTexture("media/backbutton_pressed.png");
     Texture up=loadTexture("media/backbutton.png");
-    back=Button(g.scWidth -10 - p.getWidth(),10,p,up);
+    back=Button(g.scWidth -10 - p.getWidth(),10,p,up,"",backSound);
 
     texts.push_back(textTexture("noot.",{0, 0, 0}));
     texts.push_back(textTexture("Noot",{0, 0, 0}));
@@ -39,6 +45,11 @@ void GSNoot::render() {
 }
 void GSNoot::handleEvent(SDL_Event *e) {
     if (e->type == SDL_KEYDOWN) {
+		if (e->type == SDLK_p)
+			g.music->togglePause();
         stateChange=1;
-    }
+	}
+	else if (e->type == SDL_MOUSEBUTTONUP || e->type == SDL_MOUSEBUTTONDOWN) {
+		back.handleEvent(e);
+	}
 }

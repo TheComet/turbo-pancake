@@ -1,6 +1,9 @@
 #pragma once
 #include "SDL.h"
 #include "SDL_ttf.h"
+#include "SDL_mixer.h"
+#include <iostream>
+#include "BackgroundSound.h"
 
 //Just so we can make the globals super explicit (and call them as g.renderer, g.font, etc.) 
 struct Globals {
@@ -10,6 +13,8 @@ struct Globals {
 	TTF_Font *font16;
     TTF_Font *font28;
     TTF_Font *font16bold;
+
+	BackgroundSound *music;
 
     bool quit; //false is keep running, true is "quit asap".
 
