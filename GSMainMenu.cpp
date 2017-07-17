@@ -8,6 +8,9 @@ GSMainMenu::GSMainMenu() : arena(),options(),noot(),backgroundimage(),transition
 int GSMainMenu::getStateChange() {
     return stateChange;
 }
+void GSMainMenu::resetStateChange() {
+    stateChange=0;
+}
 
 void GSMainMenu::initialize() {
 
@@ -34,6 +37,12 @@ void GSMainMenu::timestep(double dt) {
         if (!menumusic.playing()) {
             menumusic.fadeIn();
         }
+
+        if (SDL_GetTicks()-transitionstarttime > transitionduration) {
+            transitionstate=1;
+            backgroundimage.setAlpha(255);
+        }
+
     } else if (transitionstate==1) {
         //Fade in music if it's not already playing
         if (!menumusic.playing()) {
@@ -46,10 +55,15 @@ void GSMainMenu::timestep(double dt) {
             menumusic.fadeOut();
             noot.pressReceived();
         }
+        if (options.isPressed()) {
+            stateChange=2;
+            options.pressReceived();
+        }
     } else if (transitionstate==2) {
 
 		if (SDL_GetTicks() - transitionstarttime > transitionduration) {
 			transitionstate = 3;
+            backgroundimage.setAlpha(0);
 		}
     }
 }

@@ -5,13 +5,18 @@
 #include "Button.h"
 #include "GSMainMenu.h"
 #include "GSNoot.h"
+#include "GSOptions.h"
+#include "GSArena.h"
 
 //flags to determine what state we're in and if there's any transition going on.
 enum gsEnum {
     mainmenu, 
     menutonoot,
     noot,
-    noottomenu
+    noottomenu,
+    menutooptions,
+    options,
+    optionstomenu
 };
 
 /*
@@ -24,6 +29,8 @@ changing from menu to actual gameplay, etc.)
 class GameMan {
     GSMainMenu gsmain;
     GSNoot gsnoot; 
+    GSOptions gsoptions;
+    GSArena gsarena;
     
     gsEnum state;
 public:

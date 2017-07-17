@@ -6,6 +6,9 @@ GSNoot::GSNoot() : back(),x(),y(),texts() { }
 int GSNoot::getStateChange() {
     return stateChange;
 }
+void GSNoot::resetStateChange() {
+    stateChange=0;
+}
 
 void GSNoot::initialize() {
     //Initialize and position the main screen buttons
@@ -19,13 +22,13 @@ void GSNoot::initialize() {
     back=Button(g.scWidth -10 - p.getWidth(),10,p,up,"",buttonsound);
 
     texts.push_back(textTexture("noot.",{0, 0, 0}));
-    texts.push_back(textTexture("Noot",{0, 0, 0}));
-    texts.push_back(textTexture("NOOT",{0, 0, 0}));
-    texts.push_back(textTexture("noot!",{0, 0, 0}));
-    texts.push_back(textTexture("noot",{0, 0, 0}));
-    for (int i=0;i<40;i++) {
-        x.push_back(rand()%g.scWidth);
-        y.push_back(rand()%g.scHeight);
+    texts.push_back(textTexture("Noot",{0, 100, 0}));
+    texts.push_back(textTexture("NOOT",{100, 0, 0}));
+    texts.push_back(textTexture("noot!",{0, 0, 100}));
+    texts.push_back(textTexture("noot",{100,100, 0}));
+    for (int i=0;i<80;i++) {
+        x.push_back(rand()% (g.scWidth+200));
+        y.push_back(rand()% (g.scHeight+200));
     }
 }
 
@@ -35,21 +38,22 @@ void GSNoot::timestep(double dt) {
         nootmusic.fadeIn();
     }
     for (size_t i=0;i<x.size();i++) {
-        x[i]=fmod(50*dt+x[i],g.scWidth);
-        y[i]=fmod(200*dt+y[i],g.scHeight);
+        x[i]=fmod(50*dt+x[i],g.scWidth+200);
+        y[i]=fmod(200*dt+y[i],g.scHeight+200);
+    }
+    if (back.isPressed()) {
+        stateChange=1;
+        nootmusic.fadeOut();
+        back.pressReceived();
     }
 }
 void GSNoot::render() {
     for (size_t i=0;i<x.size();i++) {
-        texts[i%5].render(x[i],y[i]);
+        texts[i%5].render(x[i]-100,y[i]-100);
     }
     back.render();
 }
 void GSNoot::handleEvent(SDL_Event *e) {
-    if (e->type == SDL_KEYDOWN) {
-        stateChange=1;
-	}
-	else if (e->type == SDL_MOUSEBUTTONUP || e->type == SDL_MOUSEBUTTONDOWN) {
-		back.handleEvent(e);
-	}
+
+    back.handleEvent(e);
 }

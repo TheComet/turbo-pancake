@@ -25,6 +25,7 @@ public:
 
     //returns stateChange
     int getStateChange();
+    void resetStateChange();
     bool doneTransitioning();
 
     void initialize();

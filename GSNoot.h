@@ -16,12 +16,13 @@ class GSNoot
 
     Music nootmusic;
 
-    int stateChange; //0 is not transitioning, 1 is going to main menu.
+    int stateChange; //0 is not transitioning, 1 is going to main menu. 
 public:
     GSNoot();
 
     //returns stateChange
     int getStateChange();
+    void resetStateChange();
 
     void initialize();
 
