@@ -120,7 +120,7 @@ void close() {
 
 int main(int argc,char* args[]) {
 
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
     if (!init()) {
         cout<<"Initialization failed."<<endl;
         cin.get();
@@ -135,6 +135,9 @@ int main(int argc,char* args[]) {
         game.initialize();
 
         Uint32 lasttime = SDL_GetTicks();
+
+        Mix_VolumeMusic(0);
+        Mix_Volume(-1,0);
 
         //main loop
         while (!g.quit) {
