@@ -73,6 +73,11 @@ bool init() {
         cout<<TTF_GetError()<<endl;
         return false;
     }
+    g.font16bold = TTF_OpenFont("media/VeraBd.ttf",16);
+    if (g.font16bold==NULL) {
+        cout<<TTF_GetError()<<endl;
+        return false;
+    }
 
 	return true;
 }

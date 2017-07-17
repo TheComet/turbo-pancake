@@ -3,7 +3,7 @@
 
 
 
-GSMainMenu::GSMainMenu() : arena(),options(),noot(),backgroundimage(),transitionstate(1),transitionstarttime(0), stateChange(0) { }
+GSMainMenu::GSMainMenu() : arena(),options(),noot(),otherbut(),backgroundimage(),transitionstate(1),transitionstarttime(0), stateChange(0) { }
 
 int GSMainMenu::getStateChange() {
     return stateChange;
@@ -12,14 +12,14 @@ int GSMainMenu::getStateChange() {
 void GSMainMenu::initialize() {
 
     //Initialize and position the main screen buttons
-    Texture p=loadTexture("media/buttonpressed.png");
-    Texture up=loadTexture("media/buttonunpressed.png");
+    Texture p=loadTexture("media/buttonLong_brown_pressed.png");
+    Texture up=loadTexture("media/buttonLong_brown.png");
     int x=g.scWidth / 2 - p.getWidth()/2;
     int y0=100;
     int dy=p.getHeight()+30;
-    arena=Button(x,y0,p,up);
-    options=Button(x,y0+dy,p,up);
-    noot=Button(x,y0+2*dy,p,up);
+    arena=Button(x,y0,p,up,"Arena!");
+    options=Button(x,y0+dy,p,up,"Options!!");
+    noot=Button(x,y0+2*dy,p,up,"NOOT?!1");
 
     //Load the main screen image
     backgroundimage=loadTexture("media/mainscreen.png");
@@ -41,6 +41,7 @@ void GSMainMenu::render() {
         arena.render();
         options.render();
         noot.render();
+        otherbut.render();
     }
 }
 

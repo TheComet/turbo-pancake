@@ -9,6 +9,7 @@ struct Globals {
 	SDL_Renderer *renderer;
 	TTF_Font *font16;
     TTF_Font *font28;
+    TTF_Font *font16bold;
 
     bool quit; //false is keep running, true is "quit asap".
 

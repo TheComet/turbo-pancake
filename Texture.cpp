@@ -46,7 +46,7 @@ bool Texture::text(std::string textureText, SDL_Color textColor) {
 	free();
 
 	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Solid(g.font16, textureText.c_str(), textColor);
+	SDL_Surface* textSurface = TTF_RenderText_Blended(g.font16, textureText.c_str(), textColor);
 	if (textSurface == nullptr) {
 		cout<<"Unable to render text surface! "<<TTF_GetError()<<endl;
         return false;
@@ -67,6 +67,34 @@ bool Texture::text(std::string textureText, SDL_Color textColor) {
 
 	//Return success
 	return true;
+}
+
+bool Texture::text(std::string textureText,SDL_Color textColor,TTF_Font *font) {
+    //Get rid of preexisting texture
+    free();
+
+    //Render text surface
+    SDL_Surface* textSurface = TTF_RenderText_Blended(font,textureText.c_str(),textColor);
+    if (textSurface == nullptr) {
+        cout<<"Unable to render text surface! "<<TTF_GetError()<<endl;
+        return false;
+    }
+
+    //Create texture from surface pixels
+    mTexture =std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(g.renderer,textSurface),SDL_DestroyTexture);
+    if (mTexture == nullptr) {
+        cout<<"Unable to create texture from rendered text! "<<SDL_GetError()<<endl;
+        return false;
+    }
+    //Get image dimensions
+    width = textSurface->w;
+    height = textSurface->h;
+
+    //Get rid of old surface
+    SDL_FreeSurface(textSurface);
+
+    //Return success
+    return true;
 }
 
 void Texture::free() {
@@ -109,6 +137,10 @@ int Texture::getHeight() {
 	return height;
 }
 
+bool Texture::isNull() {
+    return mTexture == nullptr;
+}
+
 Texture loadTexture(std::string filename){
 	Texture t;
 	t.load(filename);
@@ -118,4 +150,9 @@ Texture textTexture(std::string text, SDL_Color c){
 	Texture t;
 	t.text(text, c);
 	return t;
+}
+Texture textTexture(std::string text,SDL_Color c,TTF_Font *font) {
+    Texture t;
+    t.text(text,c,font);
+    return t;
 }

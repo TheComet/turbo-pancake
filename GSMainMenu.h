@@ -5,7 +5,8 @@ class GSMainMenu
     //Main menu options
     Button arena;
     Button options;
-    Button noot; 
+    Button noot;
+    Button otherbut;
 
     Texture backgroundimage;
 

@@ -25,6 +25,8 @@ public:
 
 	//Use SDL_ttf 2.0 to render text to a texture. 
 	bool text(std::string textureText, SDL_Color textColor);
+    //Use SDL_ttf 2.0 to render text to a texture. 
+    bool text(std::string textureText,SDL_Color textColor, TTF_Font *font);
 
 	//Set texture color
 	void setColor(Uint8 red, Uint8 green, Uint8 blue);
@@ -41,7 +43,9 @@ public:
 	//Gets image dimensions
 	int getWidth();
 	int getHeight();
+    bool isNull();
 };
 
 Texture loadTexture(std::string filename);
 Texture textTexture(std::string text, SDL_Color c);
+Texture textTexture(std::string text,SDL_Color c,TTF_Font *font);
