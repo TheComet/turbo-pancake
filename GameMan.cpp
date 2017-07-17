@@ -15,9 +15,24 @@ void GameMan::initialize() {
 void GameMan::timestep(double dt) {
     if (state==gsEnum::mainmenu) {
         gsmain.timestep(dt);
+
+        int statechange=gsmain.getStateChange();
+        if (statechange) {
+            //If GSMainMenu requests a state change to "noot", fade out & change our state flag accordingly.
+            if (statechange==3) { 
+                state=gsEnum::menutonoot;
+                gsmain.fadeOut();
+            }
+        }
+
     } else if (state==gsEnum::menutonoot) {
         gsmain.timestep(dt);
         gsnoot.timestep(dt);
+
+        //If GSMainMenu is done with its transition animation, change state to "noot".
+        if (gsmain.doneTransitioning()) {
+            state=gsEnum::noot;
+        }
     } else if (state==gsEnum::noot) {
         gsnoot.timestep(dt);
     } else if (state==gsEnum::noottomenu) {

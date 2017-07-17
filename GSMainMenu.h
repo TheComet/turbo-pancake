@@ -6,7 +6,6 @@ class GSMainMenu
     Button arena;
     Button options;
     Button noot;
-    Button otherbut;
 
     Texture backgroundimage;
 
@@ -23,6 +22,7 @@ public:
 
     //returns stateChange
     int getStateChange();
+    bool doneTransitioning();
 
     void initialize();
 
@@ -30,5 +30,12 @@ public:
     void timestep(double dt);
     void render();
     void handleEvent(SDL_Event *e);
+
+    //Start the fading out transition: transitionstate=2.
+    void fadeOut();
+
+    //Start the fading in transition: transitionstate=0.
+    void fadeIn();
+
 };
 

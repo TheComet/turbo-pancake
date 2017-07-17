@@ -24,6 +24,8 @@ public:
     void setPos(int x,int y);
     void setdeltay(int dy);
 
+    void setAlpha(Uint8 alpha);
+
     //Basic necessities
 	void render();
 	void handleEvent(SDL_Event* e);
@@ -31,4 +33,6 @@ public:
     //Clicky logic
 	bool isPressed();
 	void pressReceived();
+
+    Texture & getUnpressedTexture();
 };

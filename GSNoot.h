@@ -4,10 +4,11 @@
 #include <vector>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-
+#include "Button.h"
 
 class GSNoot
 {
+    Button back;
     std::vector<double> x;
     std::vector<double> y;
     std::vector<Texture> texts;

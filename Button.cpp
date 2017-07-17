@@ -18,6 +18,7 @@ Button::Button(int x,int y,Texture ptexture,Texture utexture, std::string textst
         textshadow=textTexture(textstr,{98,83,73},g.font16bold);
     }
 }
+
 bool Button::mouseIsOverButton() {
 	int mx, my, w = unpressedTexture.getWidth(), h = unpressedTexture.getHeight();
 	SDL_GetMouseState(&mx, &my);
@@ -60,9 +61,26 @@ bool Button::isPressed() {
 void Button::pressReceived() {
 	clicked = false;
 }
+
 void Button::setPos(int x, int y) {
     xpos=x; ypos=y;
 }
+
 void Button::setdeltay(int dy) {
     deltay=dy;
+}
+
+void Button::setAlpha(Uint8 alpha) {
+    if (!unpressedTexture.isNull())
+        unpressedTexture.setAlpha(alpha);
+    if (!pressedTexture.isNull())
+        pressedTexture.setAlpha(alpha);
+    if (!text.isNull())
+        text.setAlpha(alpha);
+    if (!textshadow.isNull())
+        textshadow.setAlpha(alpha);
+}
+
+Texture & Button::getUnpressedTexture() {
+    return unpressedTexture;
 }
