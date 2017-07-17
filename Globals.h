@@ -14,6 +14,8 @@ struct Globals {
     TTF_Font *font28;
     TTF_Font *font16bold;
     Sound defaultClickSound;
+    bool mousefocus;
+    bool keyboardfocus;
 
 
     bool quit; //false is keep running, true is "quit asap".

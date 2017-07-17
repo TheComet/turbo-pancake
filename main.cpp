@@ -17,8 +17,8 @@ Globals g;
  * and SDL_TTF for loading fonts. Also load the global TTF font! */
 bool init() {
     //Window size to request.
-    g.scWidth=640;
-    g.scHeight=480;
+    g.scWidth=1280;
+    g.scHeight=800;
 
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -39,11 +39,13 @@ bool init() {
 	}
 
 	//Create window
-	g.window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, g.scWidth, g.scHeight, SDL_WINDOW_SHOWN);
+	g.window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, g.scWidth, g.scHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	if (g.window == NULL) {
         cout<<"Window could not be created! "<<SDL_GetError()<<endl;
         return false;
 	}
+    g.mousefocus = true;
+    g.keyboardfocus = true;
 
 	//Create a vsynced SDL renderer for window.
     //this takes care of graphics acceleration for us!
@@ -151,6 +153,11 @@ int main(int argc,char* args[]) {
                 else if (e.type == SDL_KEYDOWN) {
                     if (e.key.keysym.sym==SDLK_ESCAPE)
                         g.quit=true;
+                }
+                else if (e.type== SDL_WINDOWEVENT && e.window.event==SDL_WINDOWEVENT_SIZE_CHANGED) {
+                    g.scWidth = e.window.data1;
+                    g.scHeight = e.window.data2;
+                    game.windowResized();
                 }
                 game.handleEvent(&e);
             }

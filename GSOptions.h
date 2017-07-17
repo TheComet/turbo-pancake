@@ -36,5 +36,8 @@ public:
 
     //Start the fading in transition: transitionstate=0.
     void fadeIn();
+
+    //window resized event callback
+    void windowResized();
 };
 

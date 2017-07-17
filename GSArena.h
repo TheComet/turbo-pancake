@@ -17,5 +17,8 @@ public:
     void timestep(double dt);
     void render();
     void handleEvent(SDL_Event *e);
+
+    //window resized event callback
+    void windowResized();
 };
 

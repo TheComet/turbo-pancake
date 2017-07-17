@@ -41,6 +41,7 @@ void GSMainMenu::timestep(double dt) {
         if (SDL_GetTicks()-transitionstarttime > transitionduration) {
             transitionstate=1;
             backgroundimage.setAlpha(255);
+            windowResized(); //call window resized to reposition the buttons in just the right spot.
         }
 
     } else if (transitionstate==1) {
@@ -170,4 +171,14 @@ void GSMainMenu::fadeOut() {
 void GSMainMenu::fadeIn() {
     transitionstate=0;
     transitionstarttime=SDL_GetTicks();
+}
+
+
+void GSMainMenu::windowResized() {
+    int x=g.scWidth / 2 - arena.getUnpressedTexture().getWidth()/2;
+    int y0=100;
+    int dy=arena.getUnpressedTexture().getHeight()+30;
+    arena.setPos(x,y0);
+    options.setPos(x,y0+dy);
+    noot.setPos(x,y0+2*dy);
 }

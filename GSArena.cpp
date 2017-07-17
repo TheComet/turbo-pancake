@@ -34,3 +34,9 @@ void GSArena::render() {
 void GSArena::handleEvent(SDL_Event *e) {
     back.handleEvent(e);
 }
+
+
+//window resized event callback
+void GSArena::windowResized() {
+    back.setPos(g.scWidth -10 - back.getUnpressedTexture().getWidth(),10);
+}

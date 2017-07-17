@@ -183,3 +183,11 @@ void GameMan::handleEvent(SDL_Event *e) {
         gsmain.handleEvent(e);
     }
 }
+//window resized event callback
+void GameMan::windowResized() {
+    gsmain.windowResized();
+    gsarena.windowResized();
+    gsoptions.windowResized();
+    gsnoot.windowResized();
+    std::cout<<"Window resized"<<std::endl;
+}

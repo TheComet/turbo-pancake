@@ -57,3 +57,13 @@ void GSNoot::handleEvent(SDL_Event *e) {
 
     back.handleEvent(e);
 }
+
+
+//window resized event callback
+void GSNoot::windowResized() {
+    back.setPos(g.scWidth -10 - back.getUnpressedTexture().getWidth(),10);
+    for (size_t i=0;i<x.size();i++) {
+        x[i]=(rand()% (g.scWidth+200));
+        y[i]=(rand()% (g.scHeight+200));
+    }
+}

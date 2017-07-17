@@ -47,6 +47,7 @@ void GSOptions::timestep(double dt) {
     if (transitionstate==0) {
         if (SDL_GetTicks()-transitionstarttime > transitionduration) {
             transitionstate=1;
+            windowResized(); //call window resized to reposition the buttons in just the right spot.
         }
     } else if (transitionstate==1) {
         //If back button is pressed, signal that we should have a state change
@@ -152,4 +153,17 @@ void GSOptions::fadeOut() {
 void GSOptions::fadeIn() {
     transitionstate=0;
     transitionstarttime=SDL_GetTicks();
+}
+
+
+
+//window resized event callback
+void GSOptions::windowResized() {
+    int x=g.scWidth / 2 - placeholder1.getUnpressedTexture().getWidth()/2;
+    int y0=100;
+    int dy=placeholder1.getUnpressedTexture().getHeight()+30;
+    placeholder1.setPos(x,y0);
+    placeholder2.setPos(x,y0+dy);
+    back.setPos(g.scWidth -10 - back.getUnpressedTexture().getWidth(),10);
+
 }
