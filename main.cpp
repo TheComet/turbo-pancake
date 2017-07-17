@@ -61,12 +61,12 @@ bool init() {
     
 
     //Open the font
-    g.font16 = TTF_OpenFont("Vera.ttf",16);
+    g.font16 = TTF_OpenFont("media/Vera.ttf",16);
     if (g.font16==NULL) {
         cout<<TTF_GetError()<<endl;
         return false;
     }
-    g.font28 = TTF_OpenFont("Vera.ttf",28);
+    g.font28 = TTF_OpenFont("media/Vera.ttf",28);
     if (g.font28==NULL) {
         cout<<TTF_GetError()<<endl;
         return false;

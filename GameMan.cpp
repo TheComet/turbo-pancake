@@ -8,8 +8,6 @@ GameMan::GameMan() : state(0),pressedbutton(),unpressedbutton(),x(),y(),texts() 
 
 //Load & initialize internal state.
 void GameMan::initialize() {
-    pressedbutton.load("buttonpressed.png");
-    unpressedbutton.load("buttonunpressed.png");
 
 	texts.push_back(textTexture("noot.", { 0, 0, 0 }));
 	texts.push_back(textTexture("Noot", { 0, 0, 0 }));
@@ -17,8 +15,8 @@ void GameMan::initialize() {
 	texts.push_back(textTexture("noot!", { 0, 0, 0 }));
 	texts.push_back(textTexture("noot", { 0, 0, 0 }));
 
-	buttons.push_back(Button(g.scWidth / 2 - unpressedbutton.getWidth() / 2, g.scHeight / 2 - unpressedbutton.getHeight() / 2, loadTexture("buttonpressed.png"), loadTexture("buttonunpressed.png")));
-	buttons.push_back(Button(10, 10, loadTexture("buttonpressed.png"), loadTexture("buttonunpressed.png")));
+	buttons.push_back(Button(g.scWidth / 2 - unpressedbutton.getWidth() / 2, g.scHeight / 2 - unpressedbutton.getHeight() / 2, loadTexture("media/buttonpressed.png"), loadTexture("media/buttonunpressed.png")));
+	buttons.push_back(Button(10, 10, loadTexture("media/buttonpressed.png"), loadTexture("media/buttonunpressed.png")));
 
     for (int i=0;i<40;i++) {
         x.push_back(rand()%g.scWidth);
