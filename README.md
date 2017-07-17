@@ -1,3 +1,11 @@
-# turbo-pancake
+# Arena!
 
-Weekend game jam project, July 2017. Based off of SDL + SDL_image + SDL_ttf.
+Tiny game jam project, July 2017. Uses SDL + extensions. 
+
+menu stuff:
+
+![foo](readme/arena.gif)
+
+cover art:
+
+![foo](media/mainscreen.png)
