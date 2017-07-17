@@ -24,8 +24,6 @@ void GSOptions::resetStateChange() {
 }
 
 void GSOptions::initialize() {
-
-
     //Initialize and position the main screen buttons
     Texture p=loadTexture("media/buttonLong_brown_pressed.png");
     Texture up=loadTexture("media/buttonLong_brown.png");

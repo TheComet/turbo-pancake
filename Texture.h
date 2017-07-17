@@ -43,6 +43,7 @@ public:
 	int getWidth();
 	int getHeight();
     bool isNull();
+
 };
 
 Texture loadTexture(std::string filename);

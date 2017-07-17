@@ -16,7 +16,10 @@ enum gsEnum {
     noottomenu,
     menutooptions,
     options,
-    optionstomenu
+    optionstomenu,
+    menutoarena,
+    arena,
+    arenatomenu
 };
 
 /*

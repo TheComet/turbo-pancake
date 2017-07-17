@@ -113,3 +113,9 @@ void Button::setAlpha(Uint8 alpha) {
 Texture & Button::getUnpressedTexture() {
     return unpressedTexture;
 }
+int Button::getX() {
+    return xpos;
+}
+int Button::getY() {
+    return ypos;
+}

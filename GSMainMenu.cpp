@@ -49,15 +49,19 @@ void GSMainMenu::timestep(double dt) {
             menumusic.fadeIn();
         }
 
+        if (arena.isPressed()) {
+            stateChange=1;
+            arena.pressReceived();
+        }
+        if (options.isPressed()) {
+            stateChange=2;
+            options.pressReceived();
+        }
         //If noot button is pressed, fade out music and signal that we should have a state change
         if (noot.isPressed()) {
             stateChange=3;
             menumusic.fadeOut();
             noot.pressReceived();
-        }
-        if (options.isPressed()) {
-            stateChange=2;
-            options.pressReceived();
         }
     } else if (transitionstate==2) {
 

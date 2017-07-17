@@ -1,6 +1,6 @@
 #include "GSNoot.h"
 
-GSNoot::GSNoot() : back(),x(),y(),texts() { }
+GSNoot::GSNoot() : back(),x(),y(),texts(),nootmusic(),stateChange(0) { }
 
 //returns stateChange
 int GSNoot::getStateChange() {

@@ -46,4 +46,7 @@ public:
 	void playSound();
 
     Texture & getUnpressedTexture();
+
+    int getX();
+    int getY();
 };

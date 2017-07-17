@@ -9,16 +9,20 @@ void GameMan::initialize() {
     gsmain.initialize();
     gsnoot.initialize();
     gsoptions.initialize();
+    gsarena.initialize();
+
 }
 
 //Timestep. Calls timestep on the current active game state.
 void GameMan::timestep(double dt) {
     if (state==gsEnum::mainmenu) {
         gsmain.timestep(dt);
-
         int statechange=gsmain.getStateChange();
         if (statechange) {
-            if (statechange==2) { //If GSMainMenu requests a state change to "options", fade out & change our state flag accordingly.
+            if (statechange==1) {//If GSMainMenu requests a state change to "arena", fade out & change our state flag accordingly.
+                state=gsEnum::menutoarena;
+                gsmain.fadeOut();
+            } else if (statechange==2) { //If GSMainMenu requests a state change to "options", fade out & change our state flag accordingly.
                 state=gsEnum::menutooptions;
                 gsmain.fadeOut();
                 gsoptions.fadeIn();
@@ -54,7 +58,7 @@ void GameMan::timestep(double dt) {
             state=gsEnum::mainmenu;
         }
     } 
-    /******************** Handle option transitions to and from *************************/
+    /******************** Handle option transitions to and from state "options" *************************/
     else if (state==gsEnum::menutooptions) {
         gsmain.timestep(dt);
         gsoptions.timestep(dt);
@@ -73,6 +77,29 @@ void GameMan::timestep(double dt) {
         gsmain.timestep(dt);
         gsoptions.timestep(dt);
         if (gsmain.doneTransitioning() && gsoptions.doneTransitioning()) {
+            state=gsEnum::mainmenu;
+        }
+    }
+    /******************** Handle option transitions to and from state "arena" *************************/
+    else if (state==gsEnum::menutoarena) {
+        gsmain.timestep(dt);
+        gsarena.timestep(dt);
+        if (gsmain.doneTransitioning()) {
+            state=gsEnum::arena;
+        }
+    }
+    else if (state==gsEnum::arena) {
+        gsarena.timestep(dt);
+        if (gsarena.getStateChange()==1) {
+            state=gsEnum::arenatomenu;
+            gsmain.fadeIn();
+            gsarena.resetStateChange();
+        }
+    }
+    else if (state==gsEnum::arenatomenu) {
+        gsmain.timestep(dt);
+        gsarena.timestep(dt);
+        if (gsmain.doneTransitioning()) {
             state=gsEnum::mainmenu;
         }
     }
@@ -104,6 +131,19 @@ void GameMan::render() {
         gsoptions.render();
         gsmain.render();
     }
+    else if (state==gsEnum::menutoarena) {
+        gsarena.render();
+        gsmain.render();
+    }
+    else if (state==gsEnum::arena) {
+        gsarena.render();
+    }
+    else if (state==gsEnum::arenatomenu) {
+        gsarena.render();
+        gsmain.render();
+    }
+
+
 }
 void GameMan::handleEvent(SDL_Event *e) {
     if (state==gsEnum::mainmenu) {
@@ -129,6 +169,17 @@ void GameMan::handleEvent(SDL_Event *e) {
     }
     else if (state==gsEnum::optionstomenu) {
         gsoptions.handleEvent(e);
+        gsmain.handleEvent(e);
+    }
+    else if (state==gsEnum::menutoarena) {
+        gsarena.handleEvent(e);
+        gsmain.handleEvent(e);
+    }
+    else if (state==gsEnum::arena) {
+        gsarena.handleEvent(e);
+    }
+    else if (state==gsEnum::arenatomenu) {
+        gsarena.handleEvent(e);
         gsmain.handleEvent(e);
     }
 }
