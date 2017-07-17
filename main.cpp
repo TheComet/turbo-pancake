@@ -6,6 +6,8 @@
 #include "GameMan.h"
 #include <iostream>
 #include <string>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 
 using namespace std;
 Globals g;
@@ -105,7 +107,7 @@ text.text("The quick brown fox jumps over the lazy dog",textColor);
 */
 int main(int argc,char* args[]) {
 
-
+    srand(time(NULL));
     if (!init()) {
         cout<<"Initialization failed."<<endl;
         cin.get();

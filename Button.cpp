@@ -1,6 +1,15 @@
 #include "Button.h"
 #include <iostream>
 
+
+Button::Button() : pressedTexture(),unpressedTexture(),xpos(0),ypos(0),clicked(false),primed(false) { }
+
+Button::Button(int x,int y,Texture ptexture,Texture utexture): pressedTexture(Texture()),unpressedTexture(Texture()),clicked(false),primed(false)  {
+    xpos = x;
+    ypos = y;
+    pressedTexture = ptexture;
+    unpressedTexture = utexture;
+}
 bool Button::mouseIsOverButton() {
 	int mx, my, w = unpressedTexture.getWidth(), h = unpressedTexture.getHeight();
 	SDL_GetMouseState(&mx, &my);

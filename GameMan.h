@@ -3,6 +3,16 @@
 #include <vector>
 #include "Texture.h"
 #include "Button.h"
+#include "GSMainMenu.h"
+#include "GSNoot.h"
+
+//flags to determine what state we're in and if there's any transition going on.
+enum gsEnum {
+    mainmenu, 
+    menutonoot,
+    noot,
+    noottomenu
+};
 
 /*
 Game Manager class. Purpose is to handle switching between game states 
@@ -12,17 +22,10 @@ changing from menu to actual gameplay, etc.)
 
 */
 class GameMan {
-    int state; // 0 for main menu, 1 for falling text
+    GSMainMenu gsmain;
+    GSNoot gsnoot; 
     
-
-    Texture pressedbutton;
-    Texture unpressedbutton;
-	std::vector<Button> buttons;
-    std::vector<double> x;
-    std::vector<double> y;
-    std::vector<Texture> texts;
-
-
+    gsEnum state;
 public:
     GameMan();
     //Textures have destructors already, so we shouldn't have to handle a dtor.
