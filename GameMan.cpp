@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-GameMan::GameMan() : gsmain(),gsnoot(),state(gsEnum::mainmenu) {}
+GameMan::GameMan() : gsmain(),gsnoot(),state(gsEnum::mainmenu),audio(10,10) {}
 
 //Load & initialize internal state.
 void GameMan::initialize() {
@@ -143,6 +143,8 @@ void GameMan::render() {
         gsmain.render();
     }
 
+    audio.render();
+
 
 }
 void GameMan::handleEvent(SDL_Event *e) {
@@ -181,6 +183,12 @@ void GameMan::handleEvent(SDL_Event *e) {
     else if (state==gsEnum::arenatomenu) {
         gsarena.handleEvent(e);
         gsmain.handleEvent(e);
+    }
+    audio.handleEvent(e);
+    if (audio.soundLevelChanged()) {
+        int vol=(audio.getSoundLevel()*MIX_MAX_VOLUME)/100;
+        Mix_VolumeMusic(vol);
+        Mix_Volume(-1,vol);
     }
 }
 //window resized event callback

@@ -7,6 +7,7 @@
 #include "GSNoot.h"
 #include "GSOptions.h"
 #include "GSArena.h"
+#include "UI.h"
 
 //flags to determine what state we're in and if there's any transition going on.
 enum gsEnum {
@@ -36,6 +37,7 @@ class GameMan {
     GSArena gsarena;
     
     gsEnum state;
+    AudioWidget audio;
 public:
     GameMan();
     //Textures have destructors already, so we shouldn't have to handle a dtor.
