@@ -6,6 +6,8 @@
 #include "GameMan.h"
 #include <iostream>
 #include <string>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 
 using namespace std;
 Globals g;
@@ -61,13 +63,18 @@ bool init() {
     
 
     //Open the font
-    g.font16 = TTF_OpenFont("Vera.ttf",16);
+    g.font16 = TTF_OpenFont("media/Vera.ttf",16);
     if (g.font16==NULL) {
         cout<<TTF_GetError()<<endl;
         return false;
     }
-    g.font28 = TTF_OpenFont("Vera.ttf",28);
+    g.font28 = TTF_OpenFont("media/Vera.ttf",28);
     if (g.font28==NULL) {
+        cout<<TTF_GetError()<<endl;
+        return false;
+    }
+    g.font16bold = TTF_OpenFont("media/VeraBd.ttf",16);
+    if (g.font16bold==NULL) {
         cout<<TTF_GetError()<<endl;
         return false;
     }
@@ -105,7 +112,7 @@ text.text("The quick brown fox jumps over the lazy dog",textColor);
 */
 int main(int argc,char* args[]) {
 
-
+    srand(time(NULL));
     if (!init()) {
         cout<<"Initialization failed."<<endl;
         cin.get();
