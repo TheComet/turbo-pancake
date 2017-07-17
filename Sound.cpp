@@ -54,7 +54,7 @@ void Music::fadeOut(int ms) {
 
 //returns true if SOME music is playing.
 bool Music::playing() {
-    return Mix_PlayingMusic();
+    return Mix_PlayingMusic()==1;
 }
 
 Music::operator bool() {

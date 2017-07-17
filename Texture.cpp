@@ -127,6 +127,15 @@ void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cent
 	//Render to screen
 	SDL_RenderCopyEx(g.renderer, mTexture.get(), clip, &renderQuad, angle, center, flip);
 }
+void Texture::render(double x,double y,SDL_Rect* clip ,double angle,SDL_Point* center,SDL_RendererFlip flip) {
+    render(int(x),int(y),clip,angle,center,flip);
+}
+void Texture::render(int x,double y,SDL_Rect* clip,double angle,SDL_Point* center,SDL_RendererFlip flip) {
+    render(int(x),int(y),clip,angle,center,flip);
+}
+void Texture::render(double x,int y,SDL_Rect* clip,double angle,SDL_Point* center,SDL_RendererFlip flip) {
+    render(int(x),int(y),clip,angle,center,flip);
+}
 
 int Texture::getWidth() {
 	return width;

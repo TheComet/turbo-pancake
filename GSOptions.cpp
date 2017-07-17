@@ -95,9 +95,9 @@ void GSOptions::render() {
         do the same thing here, but at position - t*ytrans.
         */
         t=2*t*t-t; // nice looking animation function.
-        placeholder1.setPos(x,y0+t*ytrans);
+        placeholder1.setPos(x,int(y0+t*ytrans));
         placeholder1.render();
-        placeholder2.setPos(x,y0+dy+t*ytrans);
+        placeholder2.setPos(x,int(y0+dy+t*ytrans));
         placeholder2.render();
     }
     else if (transitionstate==0) {
@@ -124,9 +124,9 @@ void GSOptions::render() {
         do the same thing here, but at position - t*ytrans.
         */
         t=2*t*t-t; // nice looking animation function.
-        placeholder1.setPos(x,y0+t*ytrans);
+        placeholder1.setPos(x,int(y0+t*ytrans));
         placeholder1.render();
-        placeholder2.setPos(x,y0+dy+t*ytrans);
+        placeholder2.setPos(x,int(y0+dy+t*ytrans));
         placeholder2.render();
     }
 }

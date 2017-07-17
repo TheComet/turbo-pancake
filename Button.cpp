@@ -93,6 +93,9 @@ void Button::pressReceived() {
 void Button::setPos(int x, int y) {
     xpos=x; ypos=y;
 }
+void Button::setPos(double x,int y) { setPos(int(x),int(y)); }
+void Button::setPos(int x,double y) { setPos(int(x),int(y)); }
+void Button::setPos(double x,double y) { setPos(int(x),int(y)); }
 
 void Button::setdeltay(int dy) {
     deltay=dy;

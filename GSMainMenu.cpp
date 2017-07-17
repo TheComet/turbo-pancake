@@ -95,8 +95,14 @@ void GSMainMenu::render() {
         int dy=arena.getUnpressedTexture().getHeight()+30;
 
         //Draw the background button
-        if(t>0.1)
-            backgroundimage.setAlpha(floor(255*(1-(t-0.1)/0.9)));
+        if (t>0.1) {
+            int a=(int)floor(255*(1-(t-0.1)/0.9));
+            if (a<0)
+                a=0;
+            if (a>255)
+                a=255;
+            backgroundimage.setAlpha((Uint8)a);
+        }
         backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
 
         /* 
@@ -128,8 +134,14 @@ void GSMainMenu::render() {
         int dy=arena.getUnpressedTexture().getHeight()+30;
 
         //Draw the background button
-        if (t>0.1)
-            backgroundimage.setAlpha(floor(255*(1-(t-0.1)/0.9)));
+        if (t>0.1) {
+            int a=(int)floor(255*(1-(t-0.1)/0.9));
+            if (a<0)
+                a=0;
+            if (a>255)
+                a=255;
+            backgroundimage.setAlpha((Uint8)a);
+        }
         backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
 
         /*

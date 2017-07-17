@@ -31,6 +31,9 @@ public:
     
     //Setters
     void setPos(int x,int y);
+    void setPos(double x,int y);
+    void setPos(int x,double y);
+    void setPos(double x,double y);
     void setdeltay(int dy);
 
     void setAlpha(Uint8 alpha);

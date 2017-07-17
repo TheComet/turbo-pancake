@@ -38,6 +38,12 @@ public:
 
 	//Renders texture at given point
 	void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    //explicit casts the doubles to ints and sends to render.
+    void render(double x,double y,SDL_Rect* clip = NULL,double angle = 0.0,SDL_Point* center = NULL,SDL_RendererFlip flip = SDL_FLIP_NONE);
+    //explicit casts the doubles to ints and sends to render.
+    void render(int x,double y,SDL_Rect* clip = NULL,double angle = 0.0,SDL_Point* center = NULL,SDL_RendererFlip flip = SDL_FLIP_NONE);
+    //explicit casts the doubles to ints and sends to render.
+    void render(double x,int y,SDL_Rect* clip = NULL,double angle = 0.0,SDL_Point* center = NULL,SDL_RendererFlip flip = SDL_FLIP_NONE);
 
 	//Gets image dimensions
 	int getWidth();
