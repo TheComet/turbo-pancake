@@ -1,5 +1,5 @@
 #pragma once
-#include "Button.h"
+#include "UI.h"
 
 class GSMainMenu
 {

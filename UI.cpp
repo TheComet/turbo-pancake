@@ -204,7 +204,6 @@ void AudioWidget::render() {
     }
 }
 void AudioWidget::handleEvent(SDL_Event* e) {
-    std::cout<<dragged<<" "<<primed<<std::endl;
     if (!primed) {
         if (e->type == SDL_MOUSEBUTTONDOWN && mouseIsOverButton()) {
             primed = true;
@@ -240,6 +239,8 @@ void AudioWidget::handleEvent(SDL_Event* e) {
             xprimed=0; yprimed=0; soundlevelprimed=0;
             soundchanged=true;
             toggle=!toggle;
+            if (toggle && soundlevel==0)
+                soundlevel=50;
         }
         else if (dragged && e->type==SDL_MOUSEBUTTONUP) {
             primed=false;

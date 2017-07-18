@@ -1,5 +1,7 @@
 #include "GSMainMenu.h"
 #include "Globals.h"
+#include "Texture.h"
+#include "UI.h"
 
 
 

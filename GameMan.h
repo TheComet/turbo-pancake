@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include <vector>
 #include "Texture.h"
-#include "Button.h"
+#include "UI.h"
 #include "GSMainMenu.h"
 #include "GSNoot.h"
 #include "GSOptions.h"
