@@ -17,6 +17,8 @@ struct Globals {
     bool mousefocus;
     bool keyboardfocus;
 
+	float friction = 4500; //temporary map friction, should be on a tile basis later on
+
 
     bool quit; //false is keep running, true is "quit asap".
 

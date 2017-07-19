@@ -1,6 +1,9 @@
 #include "GSArena.h"
+#include "Character.h"
 
 using namespace std;
+
+TestCharacter tester;
 /*
 std::vector<Texture> tiletextures;
 int ntiles;
@@ -25,6 +28,10 @@ void ArenaMap::initialize() {
     tiletextures.push_back(loadTexture("media/1110wall.png"));
     tiletextures.push_back(loadTexture("media/1111wall.png"));
     loadEmptyMap(10);
+
+	//test character
+	//xcoord, ycoord, vel cap, acc
+	tester = TestCharacter(300, 200, 25, 120, loadTexture("media/character.png"));
 }
 void ArenaMap::resizeTileArrays() {
     tiles=vector<vector<int> >(ntiles, (vector<int>(ntiles,-1)));
@@ -197,13 +204,18 @@ void GSArena::timestep(double dt) {
         stateChange=1;
         back.pressReceived();
     }
+	tester.timestep(dt, this);
 }
 void GSArena::render() {
     map.draw(map.getNTiles()/2,map.getNTiles()/2,50);
+	tester.render();
     back.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {
-    back.handleEvent(e);
+	if (e->type != SDL_MOUSEBUTTONUP && e->type != SDL_MOUSEBUTTONDOWN)
+		tester.handleEvent(e, this);
+	else
+		back.handleEvent(e);
 }
 
 
