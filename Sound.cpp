@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-Sound::Sound() : mSound(nullptr) { }
+Sound::Sound() : mSound(nullptr), channel(-1) { }
 
 bool Sound::load(std::string path) {
     //load back button sounds
@@ -16,7 +16,18 @@ bool Sound::load(std::string path) {
 
 void Sound::play() {
     //-1 selects nearest available channel, 0 repeats the sound 0 times
-    Mix_PlayChannel(-1,mSound.get(),0);
+	if(mSound != nullptr)
+		channel = Mix_PlayChannel(-1,mSound.get(),0);
+}
+
+bool Sound::playing() {
+	return Mix_Playing(channel) == 1;
+}
+
+Sound loadSound(std::string filename) {
+	Sound s;
+	s.load(filename);
+	return s;
 }
 
 Sound::operator bool() {

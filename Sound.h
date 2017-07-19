@@ -5,15 +5,19 @@
 class Sound
 {
     std::shared_ptr<Mix_Chunk> mSound;
+	int channel;
 public:
     Sound();
 
     bool load(std::string path);
     void play();  
+	bool playing();
     
     //So we can call if(sound). Sound converts to bool and is false whenever mSound==nullptr. 
     explicit operator bool();
 };
+
+Sound loadSound(std::string filename);
 
 class Music
 {

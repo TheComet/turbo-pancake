@@ -25,6 +25,7 @@ public:
 class GSArena
 {
     Button back;
+	bool gameOver;
 
     int stateChange; //0 if no state change should occur, 1 if we're changing to main menu    
     ArenaMap map;
