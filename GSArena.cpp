@@ -31,7 +31,7 @@ void ArenaMap::initialize() {
 
 	//test character
 	//xcoord, ycoord, vel cap, acc
-	tester = TestCharacter(300, 200, 25, 120, loadTexture("media/character.png"));
+	tester = TestCharacter(300, 200, 100, 175, loadTexture("media/character.png"));
 }
 void ArenaMap::resizeTileArrays() {
     tiles=vector<vector<int> >(ntiles, (vector<int>(ntiles,-1)));

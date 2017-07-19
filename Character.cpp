@@ -13,31 +13,37 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
 	yvelocity += yacc * dt;
 	xvelocity += xacc * dt;
 	
+
 	float friction = g.friction * dt;
-	//smooth stopping, apply global friction
-	if (yvelocity < 0) {
-		if (yvelocity > -friction)
-			yvelocity = 0;
-		else
-			yvelocity += friction;
+
+	//smooth stopping, apply global friction (only if not running)
+	if (yacc == 0) {
+		if (yvelocity < 0) {
+			if (yvelocity > -friction)
+				yvelocity = 0;
+			else
+				yvelocity += friction;
+		}
+		else if (yvelocity > 0) {
+			if (yvelocity < friction)
+				yvelocity = 0;
+			else
+				yvelocity -= friction;
+		}
 	}
-	else if (yvelocity > 0) {
-		if (yvelocity < friction)
-			yvelocity = 0;
-		else
-			yvelocity -= friction;
-	}
-	if (xvelocity < 0) {
-		if (xvelocity > friction)
-			xvelocity = 0;
-		else
-			xvelocity += friction;
-	}
-	else if (xvelocity > 0) {
-		if (xvelocity < friction)
-			xvelocity = 0;
-		else
-			xvelocity -= friction;
+	if (xacc == 0) {
+		if (xvelocity < 0) {
+			if (xvelocity > friction)
+				xvelocity = 0;
+			else
+				xvelocity += friction;
+		}
+		else if (xvelocity > 0) {
+			if (xvelocity < friction)
+				xvelocity = 0;
+			else
+				xvelocity -= friction;
+		}
 	}
 
 
