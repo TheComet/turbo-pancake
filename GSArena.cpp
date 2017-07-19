@@ -3,7 +3,8 @@
 
 using namespace std;
 
-TestCharacter tester;
+CharMan chars;
+
 /*
 std::vector<Texture> tiletextures;
 int ntiles;
@@ -31,7 +32,10 @@ void ArenaMap::initialize() {
 
 	//test character
 	//xcoord, ycoord, vel cap, acc
-	tester = TestCharacter(300, 200, 100, 175, loadTexture("media/character.png"));
+	chars.addChar(350, 200, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"), true);
+	chars.addChar(800, 200, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
+	chars.addChar(350, 600, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
+	chars.addChar(800, 600, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
 }
 void ArenaMap::resizeTileArrays() {
     tiles=vector<vector<int> >(ntiles, (vector<int>(ntiles,-1)));
@@ -187,8 +191,7 @@ void ArenaMap::draw(double x0,double y0,double width, Camera& cam) {
     //draws the tiles at (x0+i*multiplier,y0+j*multiplier)
 }
 
-
-GSArena::GSArena() : back(),stateChange(0),map(),cam() {
+GSArena::GSArena() : back(),stateChange(0),map(),gameOver(false),cam() {
     cam.setDraggable();
 }
 
@@ -216,17 +219,26 @@ void GSArena::timestep(double dt) {
         stateChange=1;
         back.pressReceived();
     }
-	tester.timestep(dt, this);
     cam.timestep(dt);
+    chars.timestep(dt,this);
 }
 void GSArena::render() {
     map.draw(map.getNTiles()/2,map.getNTiles()/2,50, cam);
-	tester.render();
+	chars.render();
     back.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {
-	if (e->type != SDL_MOUSEBUTTONUP && e->type != SDL_MOUSEBUTTONDOWN)
-		tester.handleEvent(e, this);
+	if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_PERIOD)
+		chars.toggleControl();
+	else if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_k) {
+		chars.removeChar();
+		if (chars.gameOver()) {
+			gameOver = true;
+			//do gameOver rendering stuff somewhere TODO
+		}
+	}
+	else if (e->type != SDL_MOUSEBUTTONUP && e->type != SDL_MOUSEBUTTONDOWN)
+		chars.handleEvent(e, this);
 	else
 		back.handleEvent(e);
     cam.handleEvent(e);
