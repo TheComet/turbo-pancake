@@ -61,16 +61,3 @@ public:
 	void render();
 };
 
-class Camera {
-	int x;
-	int y;
-	int zoom;
-
-public:
-	Camera();
-
-	//Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
-	void renderTexture(Texture &arg, double wx, double wy, double angle, double width);
-};
-
-

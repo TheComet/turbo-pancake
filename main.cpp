@@ -161,6 +161,8 @@ int main(int argc,char* args[]) {
                 }
                 game.handleEvent(&e);
             }
+            
+            SDL_GetMouseState(&g.mousex,&g.mousey);
 
             Uint32 newtime= SDL_GetTicks();
             game.timestep((newtime-lasttime)*0.001);

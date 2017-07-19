@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "UI.h"
 #include <vector>
+#include "Camera.h"
 
 class ArenaMap {
     std::vector<Texture> tiletextures;
@@ -19,7 +20,7 @@ public:
     void recalculateWallTiles();
     bool isInBounds(int x,int y);
     //
-    void draw(double x0, double y0, double width);
+    void draw(double x0, double y0, double width, Camera& cam);
     int getNTiles();
 };
 class GSArena
@@ -28,6 +29,7 @@ class GSArena
 
     int stateChange; //0 if no state change should occur, 1 if we're changing to main menu    
     ArenaMap map;
+    Camera cam;
 public:
     GSArena();
     void initialize();

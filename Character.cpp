@@ -124,13 +124,3 @@ void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
 void TestCharacter::render(){
 	t.render(xpos,ypos);
 }
-
-
-Camera::Camera() {
-
-}
-
-//Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
-void Camera::renderTexture(Texture &arg, double wx, double wy, double angle, double width) {
-
-}

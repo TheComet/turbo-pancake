@@ -153,10 +153,12 @@ void ArenaMap::recalculateWallTiles() {
     }
 }
 
-void ArenaMap::draw(double x0,double y0,double width) {
+void ArenaMap::draw(double x0,double y0,double width, Camera& cam) {
     for (int i=0;i<ntiles;i++) {
         for (int j=0;j<ntiles;j++) {
             int x,y,wx,wy;
+
+            /*
             x=(int)floor((i*width-x0*width)+g.scWidth/2-width/2);
             y=(int)floor((j*width-y0*width)+g.scHeight/2-width/2);
             wx=(int)ceil(((i+1)*width-x0*width)+g.scWidth/2-width/2)-x; //In an ideal world these would be equal to width.
@@ -171,6 +173,14 @@ void ArenaMap::draw(double x0,double y0,double width) {
             if (walltextures[i][j]>=0) {
                 Texture &t=tiletextures[walltextures[i][j]];
                 t.renderScaled(x,y,wx,wy);
+            }*/
+            if (tiles[i][j]>=0) {
+                Texture &t=tiletextures[tiles[i][j]];
+                cam.renderTexture(t,i,j,0,1);
+            }
+            if (walltextures[i][j]>=0) {
+                Texture &t=tiletextures[walltextures[i][j]];
+                cam.renderTexture(t,i,j,0,1);
             }
         }
     }
@@ -178,7 +188,9 @@ void ArenaMap::draw(double x0,double y0,double width) {
 }
 
 
-GSArena::GSArena() : back(),stateChange(0),map() { }
+GSArena::GSArena() : back(),stateChange(0),map(),cam() {
+    cam.setDraggable();
+}
 
 //returns stateChange
 int GSArena::getStateChange() {
@@ -205,9 +217,10 @@ void GSArena::timestep(double dt) {
         back.pressReceived();
     }
 	tester.timestep(dt, this);
+    cam.timestep(dt);
 }
 void GSArena::render() {
-    map.draw(map.getNTiles()/2,map.getNTiles()/2,50);
+    map.draw(map.getNTiles()/2,map.getNTiles()/2,50, cam);
 	tester.render();
     back.render();
 }
@@ -216,6 +229,7 @@ void GSArena::handleEvent(SDL_Event *e) {
 		tester.handleEvent(e, this);
 	else
 		back.handleEvent(e);
+    cam.handleEvent(e);
 }
 
 
