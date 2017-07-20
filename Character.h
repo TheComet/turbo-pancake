@@ -1,23 +1,9 @@
 #pragma once
 #include "GSArena.h"
+#include "Camera.h"
 
-/*
-class Geometry {
-
-};
-class CollisionHandler {
-	std::vector<Geometry *> list;
-public:
-	getCollision()
-
-
-};
-*/
 
 class Character {
-	/*Geometry hitbox[];
-	Behavior*/
-	//int hp
 protected:
 	float xacc;
 	float yacc;
@@ -32,27 +18,14 @@ protected:
 	bool controlled;
 public:
 
-	Character() : xacc(0), yacc(0), xvelocity(0), yvelocity(0), controlled(false) {}
-	virtual ~Character() {}
+    Character();
+    virtual ~Character();
 
 	//virtual Geometry *getGeometry()=0;
 	virtual void timestep(double dt,GSArena *gs)=0;
 	virtual void handleEvent(SDL_Event *e, GSArena *gs)=0;
-	virtual void render()=0;
+	virtual void render(const Camera& arg)=0;
 	Sound deathSound;
-	/*void moveLeft(float speed);
-	void moveRight(float speed);
-	void moveUp(float speed);
-	void moveDown(float speed);
-	bool characterIsControlled(); */
-	/*void toggleControl() {
-		controlled ^= controlled;
-	}
-
-	bool beingControlled() {
-		return controlled;
-	} */
-
 };
 
 class TestCharacter : Character {
@@ -62,10 +35,8 @@ public:
 	~TestCharacter() {}
 	void timestep(double dt, GSArena *gs);
 	void handleEvent(SDL_Event *e, GSArena *gs);
-	void render();
+	void render(const Camera& arg);
 };
-
-
 class CharMan {
 	std::vector<Character *> list;
 	std::vector<Character *> delist;
@@ -80,8 +51,6 @@ public:
 	void handleEvent(SDL_Event *e, GSArena *gs);
 	void toggleControl();
 	void toDelete();
-	bool gameOver() {
-		return !(list.size() > 0);
-	}
-	void render();
+    bool gameOver();
+	void render(const Camera& arg);
 };

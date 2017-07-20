@@ -64,7 +64,6 @@ void Camera::timestep(double dt) {
     } else if (dragging && cameradraggable){
         lastpos=pos;
         pos=(mousedragpospixels-Vector2(g.mousex,g.mousey))/multiplier+mousedragpos;
-        std::cout<<pos<<std::endl;
     }
 }
 

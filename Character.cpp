@@ -50,8 +50,6 @@ void CharMan::toDelete() {
 			delete delist[0];
 			delist.erase(delist.begin());
 		}
-		else
-			delist[0]->render();
 	}
 }
 
@@ -67,9 +65,9 @@ void CharMan::handleEvent(SDL_Event *e, GSArena *gs) {
 		currentlyControlled->handleEvent(e, gs);
 }
 
-void CharMan::render() {
+void CharMan::render(const Camera& cam) {
 	for (auto it = list.begin(); it != list.end(); it++) {
-		(*it)->render();
+		(*it)->render(cam);
 	}
 	toDelete();
 }
@@ -89,6 +87,12 @@ void CharMan::toggleControl() {
 		}
 	}
 }
+bool CharMan::gameOver() {
+    return !(list.size() > 0);
+}
+
+Character::Character() : xacc(0),yacc(0),xvelocity(0),yvelocity(0),controlled(false) { }
+Character::~Character() { }
 
 
 
@@ -156,64 +160,18 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
 }
 
 void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
-	
-	switch (e->type) {
-		case(SDL_KEYDOWN):
-			switch (e->key.keysym.sym) {
-				case(SDLK_w):
-					if (spress)
-						yacc = 0;
-					else
-						yacc = -acceleration;
-					wpress = true;
-					break;
-				case(SDLK_a):
-					if (dpress)
-						xacc = 0;
-					else
-						xacc = -acceleration;
-					apress = true;
-					break;
-				case(SDLK_s):
-					if (wpress)
-						yacc = 0;
-					else
-						yacc = acceleration;
-					spress = true;
-					break;
-				case(SDLK_d):
-					if (apress)
-						xacc = 0;
-					else
-						xacc = acceleration;
-					dpress = true;
-					break;
-			}
-			break;
-		case(SDL_KEYUP):
-			switch (e->key.keysym.sym) {
-				case(SDLK_w):
-					yacc = 0;
-					wpress = false;
-					break;
-				case(SDLK_a):
-					xacc = 0;
-					apress = false;
-					break;
-				case(SDLK_s):
-					yacc = 0;
-					spress = false;
-					break;
-				case(SDLK_d):
-					xacc = 0;
-					dpress = false;
-					break;
-			}
-			break;
-	} 
-
+    xacc=yacc=0;
+    if (g.wdown)
+        yacc-=acceleration;
+    if (g.adown)
+        xacc-=acceleration;
+    if (g.sdown)
+        yacc+=acceleration;
+    if (g.ddown)
+        xacc+=acceleration;
 }
 
-void TestCharacter::render(){
-	t.render(xpos,ypos);
+void TestCharacter::render(const Camera& arg){
+    arg.renderTexture(t,xpos,ypos,0,1);
+    //t.render(xpos,ypos);
 }

@@ -32,10 +32,10 @@ void ArenaMap::initialize() {
 
 	//test character
 	//xcoord, ycoord, vel cap, acc
-	chars.addChar(350, 200, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"), true);
-	chars.addChar(800, 200, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
-	chars.addChar(350, 600, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
-	chars.addChar(800, 600, 100, 175, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
+	chars.addChar(3, 3, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"), true);
+	chars.addChar(3,10, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
+	chars.addChar(10, 3, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
+	chars.addChar(10,10, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
 }
 void ArenaMap::resizeTileArrays() {
     tiles=vector<vector<int> >(ntiles, (vector<int>(ntiles,-1)));
@@ -224,7 +224,7 @@ void GSArena::timestep(double dt) {
 }
 void GSArena::render() {
     map.draw(map.getNTiles()/2,map.getNTiles()/2,50, cam);
-	chars.render();
+	chars.render(cam);
     back.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {

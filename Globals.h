@@ -13,8 +13,11 @@ struct Globals {
 	TTF_Font *font16;
     TTF_Font *font28;
     TTF_Font *font16bold;
-    int mousex,mousey;
     Sound defaultClickSound;
+
+    int mousex,mousey;
+    bool wdown, adown, sdown, ddown;
+
     bool mousefocus;
     bool keyboardfocus;
 

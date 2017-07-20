@@ -34,7 +34,7 @@ bool init() {
 	}
 
 	//Set texture filtering
-	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0")) {
+	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2")) {
         cout<<"Warning: texture filtering not set correctly!"<<endl;
 	}
 
@@ -153,14 +153,47 @@ int main(int argc,char* args[]) {
                 else if (e.type == SDL_KEYDOWN) {
                     if (e.key.keysym.sym==SDLK_ESCAPE)
                         g.quit=true;
+                    else if (e.key.keysym.sym==SDLK_w)
+                        g.wdown=true;
+                    else if (e.key.keysym.sym==SDLK_a)
+                        g.adown=true;
+                    else if (e.key.keysym.sym==SDLK_s)
+                        g.sdown=true;
+                    else if (e.key.keysym.sym==SDLK_d)
+                        g.ddown=true;
+                } 
+                else if (e.type==SDL_KEYUP) {
+                    if (e.key.keysym.sym==SDLK_w)
+                        g.wdown=false;
+                    else if (e.key.keysym.sym==SDLK_a)
+                        g.adown=false;
+                    else if (e.key.keysym.sym==SDLK_s)
+                        g.sdown=false;
+                    else if (e.key.keysym.sym==SDLK_d)
+                        g.ddown=false;
                 }
                 else if (e.type== SDL_WINDOWEVENT && e.window.event==SDL_WINDOWEVENT_SIZE_CHANGED) {
                     g.scWidth = e.window.data1;
                     g.scHeight = e.window.data2;
                     game.windowResized();
                 }
+               
                 game.handleEvent(&e);
             }
+            const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
+            g.wdown=(keyboardState[SDL_SCANCODE_W]==1);
+            g.adown=(keyboardState[SDL_SCANCODE_A]==1);
+            g.sdown=(keyboardState[SDL_SCANCODE_S]==1);
+            g.ddown=(keyboardState[SDL_SCANCODE_D]==1);
+            if (g.wdown)
+                cout<<"w down"<<endl;
+            if (g.adown)
+                cout<<"a down"<<endl;
+            if (g.sdown)
+                cout<<"s down"<<endl;
+            if (g.ddown)
+                cout<<"d down"<<endl;
+
             
             SDL_GetMouseState(&g.mousex,&g.mousey);
 
