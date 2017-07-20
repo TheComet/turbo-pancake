@@ -21,12 +21,10 @@ struct Globals {
     bool mousefocus;
     bool keyboardfocus;
 
-	float friction; //temporary map friction, should be on a tile basis later on
-
 
     bool quit; //false is keep running, true is "quit asap".
 
-    Globals() : scWidth(640),scHeight(480),window(NULL),renderer(NULL),font16(NULL),font28(NULL),quit(false),friction(150) {}
+    Globals() : scWidth(640),scHeight(480),window(NULL),renderer(NULL),font16(NULL),font28(NULL),quit(false) {}
 };
 
 extern Globals g;

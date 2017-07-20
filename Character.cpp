@@ -91,87 +91,51 @@ bool CharMan::gameOver() {
     return !(list.size() > 0);
 }
 
-Character::Character() : xacc(0),yacc(0),xvelocity(0),yvelocity(0),controlled(false) { }
+Character::Character() : acc(),accMagnitude(0),vel(),pos(),speedcap(0),t(),controlled(false) { }
 Character::~Character() { }
 
 
 
 TestCharacter::TestCharacter(int x, int y, float velcap, float acc, Texture img, Sound death) : Character() {
-	xpos = x;
-	ypos = y;
+    pos=Vector2(x,y);
 	speedcap = velcap;
-	acceleration = acc;
+	accMagnitude = acc;
 	t = img;
 	deathSound = death;
-	wpress = apress = spress = dpress = false;
 }
 
 void TestCharacter::timestep(double dt, GSArena *gs) {
-	yvelocity += yacc * dt;
-	xvelocity += xacc * dt;
-	
+    vel+=acc*dt;
+    //0 the vector if it gets too small.
+    if (vel.length()<0.0005)
+        vel=Vector2();
+    //If velocity is greater than speedcap, set it to length speedcap.
+    if (vel.length()>speedcap)
+        vel=vel.normalized()*speedcap;
 
-	float friction = g.friction * dt;
+    //Apply friction.
+    //This corresponds to viscous friction x''(t)=-friction*x'(t) instead of constant friction,
+    //but we can tweak it if we want.
+    double friction=1;
+    vel=vel*fmax(1-friction*dt,0);
 
-	//smooth stopping, apply global friction (only if not running)
-	if (yacc == 0) {
-		if (yvelocity < 0) {
-			if (yvelocity > -friction)
-				yvelocity = 0;
-			else
-				yvelocity += friction;
-		}
-		else if (yvelocity > 0) {
-			if (yvelocity < friction)
-				yvelocity = 0;
-			else
-				yvelocity -= friction;
-		}
-	}
-	if (xacc == 0) {
-		if (xvelocity < 0) {
-			if (xvelocity > friction)
-				xvelocity = 0;
-			else
-				xvelocity += friction;
-		}
-		else if (xvelocity > 0) {
-			if (xvelocity < friction)
-				xvelocity = 0;
-			else
-				xvelocity -= friction;
-		}
-	}
-
-
-	//make sure velocity doesnt exceed speed cap
-	if (yvelocity > speedcap)
-		yvelocity = speedcap;
-	else if (yvelocity < -speedcap)
-		yvelocity = -speedcap;
-	if (xvelocity > speedcap)
-		xvelocity = speedcap;
-	else if (xvelocity < -speedcap)
-		xvelocity = -speedcap;
-
-	//after final adjustments, move the character's coordinates
-	xpos = xpos + xvelocity * dt;
-	ypos = ypos + yvelocity * dt;
+    //after final adjustments, move the character's coordinates
+    pos+=vel*dt;
 }
 
 void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
-    xacc=yacc=0;
+    //Overkill to do this on every event. Maybe move to timestep? IDK, but it works!
+    acc=Vector2();
     if (g.wdown)
-        yacc-=acceleration;
+        acc.y-=accMagnitude;
     if (g.adown)
-        xacc-=acceleration;
+        acc.x-=accMagnitude;
     if (g.sdown)
-        yacc+=acceleration;
+        acc.y+=accMagnitude;
     if (g.ddown)
-        xacc+=acceleration;
+        acc.x+=accMagnitude;
 }
 
 void TestCharacter::render(const Camera& arg){
-    arg.renderTexture(t,xpos,ypos,0,1);
-    //t.render(xpos,ypos);
+    arg.renderTexture(t,pos.x,pos.y,0,1);
 }

@@ -1,20 +1,19 @@
 #pragma once
 #include "GSArena.h"
 #include "Camera.h"
+#include "Vector2.h"
 
 
 class Character {
 protected:
-	float xacc;
-	float yacc;
-	float acceleration; //acceleration
-	float xvelocity;
-	float yvelocity;
-	float xpos;
-	float ypos;
-	float speedcap; // velocity cap
+    Vector2 acc;
+    double accMagnitude;
+    Vector2 vel;
+    Vector2 pos;
+	double speedcap; // velocity cap
+
 	Texture t;
-	bool wpress, apress, spress, dpress; //for opposite key press checking
+
 	bool controlled;
 public:
 
