@@ -3,7 +3,99 @@
 
 using namespace std;
 
-CharMan chars;
+
+
+
+CharMan::~CharMan() {
+    for (auto it = list.begin(); it != list.end(); it++) {
+        delete *it;
+    }
+    list.clear();
+}
+
+void CharMan::addChar(int x,int y,float velcap,float acc,Texture img,Sound death,bool assignControl) {
+    /*Sound *deathSound = new Sound();
+    deathSound.load(death); */
+    Character *newChar = (Character *)new TestCharacter(x,y,velcap,acc,img,death);
+    list.push_back(newChar);
+    if (assignControl)
+        currentlyControlled = newChar;
+}
+
+void CharMan::removeChar(Character * toRemove) {
+    //right now we can just take no arg and kill controlled unit
+    if (!toRemove)
+        toRemove = currentlyControlled;
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if (*it == toRemove) {
+            //check if we just killed controlled unit.. if so toggle
+            if (toRemove == currentlyControlled)
+                toggleControl();
+
+            //was that the only character? if so, set ptr to null
+            //check if we just killed controlled unit.. if so toggle
+            if (toRemove == currentlyControlled)
+                currentlyControlled = NULL;
+
+            //death sound and then delete
+            (*it)->deathSound.play();
+            delist.push_back(*it);
+            list.erase(it);
+            break;
+        }
+    }
+}
+
+/*
+*	Performs final death sounds + animations(later on) before removing from map.
+*/
+void CharMan::toDelete() {
+    if (delist.size() > 0) {
+        if (!(delist[0]->deathSound.playing())) {
+            std::cout << "this ran" << std::endl;
+            delete delist[0];
+            delist.erase(delist.begin());
+        }
+    }
+}
+
+void CharMan::timestep(double dt,GSArena *gs) {
+    for (auto it = list.begin(); it != list.end(); it++) {
+        (*it)->timestep(dt,gs);
+    }
+}
+
+void CharMan::handleEvent(SDL_Event *e,GSArena *gs) {
+    //only take keyboard input for current controllable unit
+    if (currentlyControlled)
+        currentlyControlled->handleEvent(e,gs);
+}
+
+void CharMan::render(const Camera& cam) {
+    for (auto it = list.begin(); it != list.end(); it++) {
+        (*it)->render(cam);
+    }
+    toDelete();
+}
+
+void CharMan::toggleControl() {
+    //check to make sure valid controllable unit present
+    if (list.size() == 0)
+        return;
+    //just toggle to next available in list
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if (*it == currentlyControlled) {
+            if (++it == list.end())
+                currentlyControlled = *(list.begin());
+            else
+                currentlyControlled = *it;
+            break;
+        }
+    }
+}
+bool CharMan::gameOver() {
+    return !(list.size() > 0);
+}
 
 /*
 std::vector<Texture> tiletextures;
@@ -30,12 +122,6 @@ void ArenaMap::initialize() {
     tiletextures.push_back(loadTexture("media/1111wall.png"));
     loadEmptyMap(10);
 
-	//test character
-	//xcoord, ycoord, vel cap, acc
-	chars.addChar(3, 3, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"), true);
-	chars.addChar(3,10, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
-	chars.addChar(10, 3, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
-	chars.addChar(10,10, 3, 3, loadTexture("media/character.png"), loadSound("media/audio/hnng.mp3"));
 }
 void ArenaMap::resizeTileArrays() {
     tiles=vector<vector<int> >(ntiles, (vector<int>(ntiles,-1)));
@@ -211,6 +297,13 @@ void GSArena::initialize() {
     back=Button(g.scWidth -10 - p.getWidth(),10,p,up);
     stateChange=0;
     map.initialize();
+
+    //test character
+    //xcoord, ycoord, vel cap, acc
+    charman.addChar(3,3,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"),true);
+    charman.addChar(3,10,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"));
+    charman.addChar(10,3,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"));
+    charman.addChar(10,10,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"));
 }
 
 //Timestep. Calls timestep on the current active game state.
@@ -220,25 +313,25 @@ void GSArena::timestep(double dt) {
         back.pressReceived();
     }
     cam.timestep(dt);
-    chars.timestep(dt,this);
+    charman.timestep(dt,this);
 }
 void GSArena::render() {
     map.draw(map.getNTiles()/2,map.getNTiles()/2,50, cam);
-	chars.render(cam);
+    charman.render(cam);
     back.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {
 	if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_PERIOD)
-		chars.toggleControl();
+        charman.toggleControl();
 	else if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_k) {
-		chars.removeChar();
-		if (chars.gameOver()) {
+        charman.removeChar();
+		if (charman.gameOver()) {
 			gameOver = true;
 			//do gameOver rendering stuff somewhere TODO
 		}
 	}
 	else if (e->type != SDL_MOUSEBUTTONUP && e->type != SDL_MOUSEBUTTONDOWN)
-		chars.handleEvent(e, this);
+        charman.handleEvent(e, this);
 	else
 		back.handleEvent(e);
     cam.handleEvent(e);

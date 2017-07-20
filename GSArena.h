@@ -4,6 +4,28 @@
 #include "UI.h"
 #include <vector>
 #include "Camera.h"
+#include "Character.h"
+
+
+class GSArena;
+
+class CharMan {
+    std::vector<Character *> list;
+    std::vector<Character *> delist;
+    Character *currentlyControlled;
+public:
+    CharMan() : currentlyControlled(NULL) {}
+    CharMan(const CharMan& other) {}
+    ~CharMan();
+    void addChar(int x = 0,int y = 0,float velcap = 0,float acc = 0,Texture img = Texture(),Sound death = Sound(),bool assignControl = false);
+    void removeChar(Character *toRemove = NULL);
+    void timestep(double dt,GSArena *gs);
+    void handleEvent(SDL_Event *e,GSArena *gs);
+    void toggleControl();
+    void toDelete();
+    bool gameOver();
+    void render(const Camera& arg);
+};
 
 class ArenaMap {
     std::vector<Texture> tiletextures;
@@ -29,9 +51,12 @@ class GSArena
 	bool gameOver;
 
     int stateChange; //0 if no state change should occur, 1 if we're changing to main menu    
+
+public:
     ArenaMap map;
     Camera cam;
-public:
+    CharMan charman;
+
     GSArena();
     void initialize();
 
