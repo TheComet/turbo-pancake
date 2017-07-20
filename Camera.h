@@ -33,4 +33,9 @@ public:
 
     //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
     void renderTexture(Texture &arg,double wx,double wy,double angle,double width) const;
+    //Render tile on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
+
+    //Rendering a tile ensures that the square image is drawn from the floor of the leftmost pixel to the ceil of the rightmost pixel,
+    //so that you don't get off-by-one errors in pixel drawing.
+    void renderTile(Texture &arg,double wx,double wy,double width) const;
 };

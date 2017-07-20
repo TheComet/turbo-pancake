@@ -3,8 +3,7 @@
 
 using namespace std;
 
-
-
+CharMan::CharMan() : list(), delist(),currentlyControlled(NULL) {}
 
 CharMan::~CharMan() {
     for (auto it = list.begin(); it != list.end(); it++) {
@@ -266,11 +265,11 @@ void ArenaMap::draw(double x0,double y0,double width, Camera& cam) {
             }*/
             if (tiles[i][j]>=0) {
                 Texture &t=tiletextures[tiles[i][j]];
-                cam.renderTexture(t,i,j,0,1);
+                cam.renderTile(t,i,j,1);
             }
             if (walltextures[i][j]>=0) {
                 Texture &t=tiletextures[walltextures[i][j]];
-                cam.renderTexture(t,i,j,0,1);
+                cam.renderTile(t,i,j,1);
             }
         }
     }
@@ -295,15 +294,30 @@ void GSArena::initialize() {
     Texture up=loadTexture("media/backbutton.png");
 
     back=Button(g.scWidth -10 - p.getWidth(),10,p,up);
+
+    p=loadTexture("media/buttonLong_blue_pressed.png");
+    up=loadTexture("media/buttonLong_blue.png");
+    resetButton=Button(10,g.scHeight-10-p.getHeight(),p,up,"Reset Chars");
+
     stateChange=0;
     map.initialize();
 
     //test character
     //xcoord, ycoord, vel cap, acc
-    charman.addChar(3,3,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"),true);
-    charman.addChar(3,10,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"));
-    charman.addChar(10,3,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"));
-    charman.addChar(10,10,3,3,loadTexture("media/character.png"),loadSound("media/audio/hnng.mp3"));
+    Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
+    charman.addChar(3,3,3,3,charactertexture,Sound(),true);
+    charman.addChar(3,10,3,3,charactertexture,Sound());
+    charman.addChar(10,3,3,3,charactertexture,Sound());
+    charman.addChar(10,10,3,3,charactertexture,Sound());
+}
+
+void GSArena::reset() {
+    charman=CharMan();
+    Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
+    charman.addChar(3,3,3,3,charactertexture,Sound(),true);
+    charman.addChar(3,10,3,3,charactertexture,Sound());
+    charman.addChar(10,3,3,3,charactertexture,Sound());
+    charman.addChar(10,10,3,3,charactertexture,Sound());
 }
 
 //Timestep. Calls timestep on the current active game state.
@@ -312,6 +326,10 @@ void GSArena::timestep(double dt) {
         stateChange=1;
         back.pressReceived();
     }
+    if (resetButton.isPressed()) {
+        reset();
+        resetButton.pressReceived();
+    }
     cam.timestep(dt);
     charman.timestep(dt,this);
 }
@@ -319,6 +337,7 @@ void GSArena::render() {
     map.draw(map.getNTiles()/2,map.getNTiles()/2,50, cam);
     charman.render(cam);
     back.render();
+    resetButton.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {
 	if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_PERIOD)
@@ -330,13 +349,12 @@ void GSArena::handleEvent(SDL_Event *e) {
 			//do gameOver rendering stuff somewhere TODO
 		}
 	}
-	else if (e->type != SDL_MOUSEBUTTONUP && e->type != SDL_MOUSEBUTTONDOWN)
-        charman.handleEvent(e, this);
-	else
-		back.handleEvent(e);
+	
+    charman.handleEvent(e, this);
+	back.handleEvent(e);
     cam.handleEvent(e);
+    resetButton.handleEvent(e);
 }
-
 
 //window resized event callback
 void GSArena::windowResized() {

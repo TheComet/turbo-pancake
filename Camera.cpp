@@ -71,3 +71,12 @@ void Camera::timestep(double dt) {
 void Camera::renderTexture(Texture &arg,double wx,double wy,double angle,double width) const {
     arg.renderScaled((wx-pos.x)*width*multiplier+g.scWidth/2,(wy-pos.y)*width*multiplier+g.scHeight/2,width*multiplier,width*multiplier,nullptr,angle);
 }
+//Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
+void Camera::renderTile(Texture &arg,double wx,double wy,double width) const {
+    int pixelx=(int)floor((wx-pos.x)*width*multiplier+g.scWidth/2);
+    int pixely=(int)floor((wy-pos.y)*width*multiplier+g.scHeight/2);
+    int pixelrx=(int)ceil((wx-pos.x+width)*width*multiplier+g.scWidth/2);
+    int pixeldy=(int)ceil((wy-pos.y+width)*width*multiplier+g.scHeight/2);
+
+    arg.renderScaled(pixelx,pixely,pixelrx-pixelx,pixeldy-pixely);
+}

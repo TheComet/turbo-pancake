@@ -1,12 +1,9 @@
 #include "Character.h"
 
 
-Character::Character() : acc(),accMagnitude(0),vel(),pos(),speedcap(0),t(),controlled(false) { }
-Character::~Character() { }
+Character::Character() : deathSound() { }
 
-
-
-TestCharacter::TestCharacter(int x, int y, float velcap, float acc, Texture img, Sound death) : Character() {
+TestCharacter::TestCharacter(int x, int y, float velcap, float acc, Texture img, Sound death) : Character(), acc(),accMagnitude(0),vel(),pos(),speedcap(0),t(),controlled(false)  {
     pos=Vector2(x,y);
 	speedcap = velcap;
 	accMagnitude = acc;

@@ -5,29 +5,26 @@
 class GSArena;
 
 class Character {
-protected:
-    Vector2 acc;
-    double accMagnitude;
-    Vector2 vel;
-    Vector2 pos;
-	double speedcap; // velocity cap
-
-	Texture t;
-
-	bool controlled;
 public:
+    Sound deathSound;
 
     Character();
-    virtual ~Character();
 
 	//virtual Geometry *getGeometry()=0;
 	virtual void timestep(double dt,GSArena *gs)=0;
 	virtual void handleEvent(SDL_Event *e, GSArena *gs)=0;
 	virtual void render(const Camera& arg)=0;
-	Sound deathSound;
 };
 
 class TestCharacter : Character {
+    Vector2 acc;
+    double accMagnitude;
+    Vector2 vel;
+    Vector2 pos;
+    double speedcap; // velocity cap
+
+    Texture t;
+    bool controlled;
 public:
 	TestCharacter(int x=0, int y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
 	~TestCharacter() {}

@@ -14,7 +14,7 @@ class CharMan {
     std::vector<Character *> delist;
     Character *currentlyControlled;
 public:
-    CharMan() : currentlyControlled(NULL) {}
+    CharMan();
     CharMan(const CharMan& other) {}
     ~CharMan();
     void addChar(int x = 0,int y = 0,float velcap = 0,float acc = 0,Texture img = Texture(),Sound death = Sound(),bool assignControl = false);
@@ -48,6 +48,8 @@ public:
 class GSArena
 {
     Button back;
+    Button resetButton;
+
 	bool gameOver;
 
     int stateChange; //0 if no state change should occur, 1 if we're changing to main menu    
@@ -59,6 +61,7 @@ public:
 
     GSArena();
     void initialize();
+    void reset();
 
     int getStateChange();
     void resetStateChange();
