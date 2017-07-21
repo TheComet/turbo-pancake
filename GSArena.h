@@ -17,7 +17,7 @@ public:
     CharMan();
     CharMan(const CharMan& other) {}
     ~CharMan();
-    void addChar(int x = 0,int y = 0,float velcap = 0,float acc = 0,Texture img = Texture(),Sound death = Sound(),bool assignControl = false);
+    void addChar(double x = 0,double y = 0,float velcap = 0,float acc = 0,Texture img = Texture(),Sound death = Sound(),bool assignControl = false);
     void removeChar(Character *toRemove = NULL);
     void timestep(double dt,GSArena *gs);
     void handleEvent(SDL_Event *e,GSArena *gs);

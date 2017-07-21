@@ -12,10 +12,10 @@ CharMan::~CharMan() {
     list.clear();
 }
 
-void CharMan::addChar(int x,int y,float velcap,float acc,Texture img,Sound death,bool assignControl) {
+void CharMan::addChar(double x,double y,float velcap,float acc,Texture img,Sound death,bool assignControl) {
     /*Sound *deathSound = new Sound();
     deathSound.load(death); */
-    Character *newChar = (Character *)new TestCharacter(x,y,velcap,acc,img,death);
+    Character *newChar = new TestCharacter(x,y,velcap,acc,img,death);
     list.push_back(newChar);
     if (assignControl)
         currentlyControlled = newChar;
@@ -247,22 +247,6 @@ void ArenaMap::draw(double x0,double y0,double width, Camera& cam) {
         for (int j=0;j<ntiles;j++) {
             int x,y,wx,wy;
 
-            /*
-            x=(int)floor((i*width-x0*width)+g.scWidth/2-width/2);
-            y=(int)floor((j*width-y0*width)+g.scHeight/2-width/2);
-            wx=(int)ceil(((i+1)*width-x0*width)+g.scWidth/2-width/2)-x; //In an ideal world these would be equal to width.
-            wy=(int)floor(((j+1)*width-y0*width)+g.scHeight/2-width/2)-y;
-            if ((x<0 && x+wx<0)||(y<0 && y+wy<0)||(x>g.scWidth)||(y>g.scHeight))
-                continue;
-
-            if (tiles[i][j]>=0) {
-                Texture &t=tiletextures[tiles[i][j]];
-                t.renderScaled(x,y,wx,wy);
-            }
-            if (walltextures[i][j]>=0) {
-                Texture &t=tiletextures[walltextures[i][j]];
-                t.renderScaled(x,y,wx,wy);
-            }*/
             if (tiles[i][j]>=0) {
                 Texture &t=tiletextures[tiles[i][j]];
                 cam.renderTile(t,i,j,1);
@@ -273,7 +257,6 @@ void ArenaMap::draw(double x0,double y0,double width, Camera& cam) {
             }
         }
     }
-    //draws the tiles at (x0+i*multiplier,y0+j*multiplier)
 }
 
 GSArena::GSArena() : back(),stateChange(0),map(),gameOver(false),cam() {
