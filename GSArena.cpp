@@ -341,11 +341,15 @@ void GSArena::handleEvent(SDL_Event *e) {
 			//do gameOver rendering stuff somewhere TODO
 		}
 	}
+
+    if (!g.mouseCapturedByGUI) {
+        g.mouseCapturedByGUI=g.mouseCapturedByGUI||back.handleEvent(e);
+        g.mouseCapturedByGUI=g.mouseCapturedByGUI||resetButton.handleEvent(e);
+        if(!g.mouseCapturedByGUI)
+            g.mouseCapturedByGUI=g.mouseCapturedByGUI||cam.handleEvent(e);
+    }
 	
     charman.handleEvent(e, this);
-	back.handleEvent(e);
-    cam.handleEvent(e);
-    resetButton.handleEvent(e);
 }
 
 //window resized event callback

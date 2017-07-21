@@ -39,13 +39,14 @@ bool Camera::getCameraDraggable() {
 }
 
 //Core things: events & movement!
-void Camera::handleEvent(SDL_Event *e) {
+bool Camera::handleEvent(SDL_Event *e) {
     if (e->type == SDL_MOUSEBUTTONDOWN && cameradraggable) {
         dragging=true;
         mousedragpos=pos;
         mousedragpospixels=Vector2(g.mousex,g.mousey);
         lastpos=pos;
-    } else if (e->type == SDL_MOUSEBUTTONUP && cameradraggable) {
+        return true;
+    } else if (dragging && e->type == SDL_MOUSEBUTTONUP && cameradraggable) {
         v=(pos-lastpos)/lastdt;
 
         dragging=false;
@@ -53,6 +54,7 @@ void Camera::handleEvent(SDL_Event *e) {
         mousedragpospixels=Vector2();
         lastpos=Vector2();
     }
+    return false;
 }
 void Camera::timestep(double dt) {
     lastdt=dt;

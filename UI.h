@@ -42,7 +42,11 @@ public:
 
     //Basic necessities
     void render();
-    void handleEvent(SDL_Event* e);
+
+    //handleEvent returns true if mouse input was "captured" by the GUI element.
+    //This can be used by Game States or other utilities to eg realize a mouse
+    //clicked a button and not the map!
+    bool handleEvent(SDL_Event* e);
 
     //Clicky logic
     bool isPressed();
@@ -104,7 +108,7 @@ public:
 
     //Basic necessities
     void render();
-    void handleEvent(SDL_Event* e);
+    bool handleEvent(SDL_Event* e);
 
     //reading data. getSoundLevel sets soundchanged to false.
     int getSoundLevel();

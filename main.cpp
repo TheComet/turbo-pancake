@@ -143,6 +143,8 @@ int main(int argc,char* args[]) {
 
         //main loop
         while (!g.quit) {
+            g.mouseCapturedByGUI=false;
+
             //Handle events on queue
             SDL_Event e;
             while (SDL_PollEvent(&e) != 0) {

@@ -146,6 +146,9 @@ void GameMan::render() {
 
 }
 void GameMan::handleEvent(SDL_Event *e) {
+    if (audio.handleEvent(e))
+        g.mouseCapturedByGUI=true;
+
     if (state==gsEnum::mainmenu) {
         gsmain.handleEvent(e);
     }
@@ -182,7 +185,6 @@ void GameMan::handleEvent(SDL_Event *e) {
         gsarena.handleEvent(e);
         gsmain.handleEvent(e);
     }
-    audio.handleEvent(e);
     if (audio.soundLevelChanged()) {
         int vol=(audio.getSoundLevel()*MIX_MAX_VOLUME)/100;
         Mix_VolumeMusic(vol);

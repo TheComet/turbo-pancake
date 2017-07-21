@@ -28,7 +28,7 @@ public:
     bool getCameraDraggable();
 
     //Core things: events & movement!
-    void handleEvent(SDL_Event *e);
+    bool handleEvent(SDL_Event *e);
     void timestep(double dt);
 
     //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.

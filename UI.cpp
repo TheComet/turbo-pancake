@@ -65,18 +65,22 @@ void Button::render() {
     }
 }
 
-void Button::handleEvent(SDL_Event* e) {
+bool Button::handleEvent(SDL_Event* e) {
     if (mouseIsOverButton()) {
         if (e->type == SDL_MOUSEBUTTONUP && primed) {
             primed = false;
             clicked = true;
             playSound();
+            return true;
         }
-        else if (e->type == SDL_MOUSEBUTTONDOWN)
+        else if (e->type == SDL_MOUSEBUTTONDOWN) {
             primed = true;
+            return true;
+        }
     }
     else
         primed = false;
+    return false;
 }
 
 void Button::playSound() {
@@ -203,7 +207,7 @@ void AudioWidget::render() {
         graphics[0].render(xpos,ypos);
     }
 }
-void AudioWidget::handleEvent(SDL_Event* e) {
+bool AudioWidget::handleEvent(SDL_Event* e) {
     if (!primed) {
         if (e->type == SDL_MOUSEBUTTONDOWN && mouseIsOverButton()) {
             primed = true;
@@ -211,6 +215,7 @@ void AudioWidget::handleEvent(SDL_Event* e) {
             xprimed=e->button.x;
             yprimed=e->button.y;
             soundlevelprimed=soundlevel;
+            return true;
         } 
     }
     else {//primed is true.
@@ -220,6 +225,7 @@ void AudioWidget::handleEvent(SDL_Event* e) {
             if (abs(mx-xprimed)+abs(my-yprimed) >2) {
                 dragged=true;
             }
+            return true;
         }
         else if (dragged && e->type==SDL_MOUSEMOTION) {
             int mx=e->motion.x;
@@ -232,6 +238,7 @@ void AudioWidget::handleEvent(SDL_Event* e) {
             if (soundlevel>100)
                 soundlevel=100;
             soundchanged=true;
+            return true;
         }
         else if (!dragged && e->type==SDL_MOUSEBUTTONUP) {
             primed=false;
@@ -249,6 +256,7 @@ void AudioWidget::handleEvent(SDL_Event* e) {
             soundchanged=true;
         }
     }
+    return false;
 }
 
 
