@@ -7,41 +7,56 @@ enum Tiles {
     wall,
     dirt
 };
+struct IntegerPoint {
+    int x; int y;
+    IntegerPoint() : x(0),y(0) { }
+    IntegerPoint(int a,int b) : x(a),y(b) { }
+};
 struct MapTile {
 public:
-    bool spawnable;
     Tiles ground;
     Tiles wall;
+    int spawnteam;
     int groundtexture;
-    int walltexture; 
+    int walltexture;
+    MapTile() : ground(Tiles::dirt),wall(Tiles::empty),spawnteam(-1),groundtexture(0),walltexture(0) { }
+    MapTile(Tiles uground, Tiles uwall,int uspawnteam=-1, int ugroundtexture=-1, int uwalltexture=-1) : ground(uground),wall(uwall),spawnteam(uspawnteam),groundtexture(ugroundtexture),walltexture(uwalltexture) { }
 };
 
 class ArenaMap {
     std::vector<Texture> tiletextures;
     int ntiles;
-    std::vector<std::vector<int> > tiles;
-    std::vector<std::vector<int> > walls;
-    std::vector<std::vector<int> > walltextures;
+    std::vector<std::vector<MapTile> > tiles;
 
-    //clears and resizes the tiles/walls/walltextures vectors
-    void resizeTileArrays();
+    //clears and resizes the tiles/walls/walltextures vectors to nsize
+    void resetMap();
 
-    //given the "tiles" and "walls" array, recalculates "walltextures" to display the correct texture.
-    void recalculateWallTiles();
+    void recalculateTextures();
+
+    //Loads a circle map
+    void createCircleMap(int circleradius=50);
+
+    //Loads a square with holes into it into the map.
+    void addHouseShape(int x=0,int y=0, int w=3, int h=3);
 public:
+
     ArenaMap();
+
+    //puts a wall at x,y and updates the map.
+    void addWall(int x,int y);
+
+    //returns all tiles that have the spawnable flag set to true.
+    std::vector<IntegerPoint> getSpawnablePoints(int team);
 
     //initializes to a default map.
     void initialize();
 
-    //Loads a circle map
-    void loadEmptyMap(int circleradius=50);
 
     //true if 0<=x<ntiles && 0<=y<ntiles
     bool isInBounds(int x,int y);
 
     //draw the map according to the Camera's position and orientation.
-    void draw(double x0,double y0,double width,Camera& cam);
+    void render(Camera& cam);
 
     //returns this->ntiles.
     int getNTiles();

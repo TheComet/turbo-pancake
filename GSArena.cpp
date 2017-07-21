@@ -134,20 +134,23 @@ void GSArena::initialize() {
 
     //test character
     //xcoord, ycoord, vel cap, acc
-    Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
-    charman.addChar(TestCharacter(3,3,3,3,charactertexture,Sound()),true);
-    charman.addChar(TestCharacter(3,10,3,3,charactertexture,Sound()));
-    charman.addChar(TestCharacter(10,3,3,3,charactertexture,Sound()));
-    charman.addChar(TestCharacter(10,10,3,3,charactertexture,Sound()));
+    reset();
 }
 
 void GSArena::reset() {
     charman=CharMan();
+    std::vector<IntegerPoint> sp1=map.getSpawnablePoints(0);
+    std::vector<IntegerPoint> sp2=map.getSpawnablePoints(1);
+    int a=rand()%sp1.size();
+    int b=rand()%sp1.size();
+    int c=rand()%sp2.size();
+    int d=rand()%sp2.size();
+
     Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
-    charman.addChar(TestCharacter(3,3,3,3,charactertexture,Sound()),true);
-    charman.addChar(TestCharacter(3,10,3,3,charactertexture,Sound()));
-    charman.addChar(TestCharacter(10,3,3,3,charactertexture,Sound()));
-    charman.addChar(TestCharacter(10,10,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(sp1[a].x,sp1[a].y,3,3,charactertexture,Sound()),true);
+    charman.addChar(TestCharacter(sp1[b].x,sp1[b].y,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(sp2[c].x,sp2[c].y,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(sp2[d].x,sp2[d].y,3,3,charactertexture,Sound()));
 }
 
 //Timestep. Calls timestep on the current active game state.
@@ -164,7 +167,7 @@ void GSArena::timestep(double dt) {
     charman.timestep(dt,this);
 }
 void GSArena::render() {
-    map.draw(map.getNTiles()/2,map.getNTiles()/2,50, cam);
+    map.render(cam);
     charman.render(cam);
     back.render();
     resetButton.render();
