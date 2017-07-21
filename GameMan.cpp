@@ -8,7 +8,7 @@ void GameMan::initialize() {
     gsmain.initialize();
     gsnoot.initialize();
     gsoptions.initialize();
-    //gsarena.initialize();
+    gsarena.initialize();
 }
 
 //Timestep. Calls timestep on the current active game state.
