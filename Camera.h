@@ -23,9 +23,9 @@ public:
     //Note that the center of the tile at (0,0) has coordinates (0.5,0.5).
     void centerCameraOnTile(double x,double y);
 
-    void toggleCameraDraggable();
-    void setDraggable();
-    bool getCameraDraggable();
+    void toggleCameraDraggable(); //draggable=!draggable
+    void setDraggable(); //draggable=true
+    bool getCameraDraggable(); //return draggable
 
     //Core things: events & movement!
     bool handleEvent(SDL_Event *e);
@@ -33,9 +33,9 @@ public:
 
     //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
     void renderTexture(Texture &arg,double wx,double wy,double angle,double width) const;
-    //Render tile on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
 
-    //Rendering a tile ensures that the square image is drawn from the floor of the leftmost pixel to the ceil of the rightmost pixel,
-    //so that you don't get off-by-one errors in pixel drawing.
+    //Rendering a tile ensures that the square image is drawn from the floor of the leftmost pixel 
+    //to the ceil of the rightmost pixel, so that you don't get off-by-one visual errors like 
+    //pixel-wide gaps between adjacent tiles.
     void renderTile(Texture &arg,double wx,double wy,double width) const;
 };

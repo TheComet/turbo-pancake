@@ -2,21 +2,6 @@
 #include <cmath>  
 
 
-/*
-Vector2 pos;
-double multiplier;
-
-bool cameradraggable; //if false, handleEvent does nothing.
-
-Vector2 v; //camera velocity for click and drag releases
-double drag,maxv; // max velocity
-
-Vector2 mousedragpos; //x and y when the mouse was clicked
-Vector2 mousedragpospixels; //x and y of the mouse when it was clicked
-Vector2 lastpos;//x and y the last frame. Used for calculating final velocity. 
-
-bool dragging; //true if the mouse has been clicked and held.
-public:*/
 Camera::Camera () : pos(), multiplier(50),cameradraggable(false),v(),drag(10),maxv(200),mousedragpos(),lastpos(),dragging(false),lastdt(0.01) { }
 
 //Ensures that the point at (x,y) is at the center of the screen.
