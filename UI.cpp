@@ -119,7 +119,7 @@ void Button::setAlpha(Uint8 alpha) {
         textshadow.setAlpha(alpha);
 }
 
-Texture & Button::getUnpressedTexture() {
+Texture Button::getUnpressedTexture() {
     return unpressedTexture;
 }
 int Button::getX() {
@@ -265,7 +265,7 @@ void AudioWidget::playSound() {
         soundEffect.play();
 }
 
-Texture & AudioWidget::getUnpressedTexture() {
+Texture AudioWidget::getUnpressedTexture() {
     if (graphics.size()!=4)
         return Texture();
     

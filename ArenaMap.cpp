@@ -148,8 +148,6 @@ void ArenaMap::recalculateWallTiles() {
 void ArenaMap::draw(double x0,double y0,double width,Camera& cam) {
     for (int i=0;i<ntiles;i++) {
         for (int j=0;j<ntiles;j++) {
-            int x,y,wx,wy;
-
             if (tiles[i][j]>=0) {
                 Texture &t=tiletextures[tiles[i][j]];
                 cam.renderTile(t,i,j,1);

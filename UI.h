@@ -54,7 +54,7 @@ public:
 
     void playSound();
 
-    Texture & getUnpressedTexture();
+    Texture getUnpressedTexture();
 
     int getX();
     int getY();
@@ -115,7 +115,7 @@ public:
     //Check if soundlevel has been changed since getSoundLevel was last read.
     bool soundLevelChanged();
 
-    Texture & getUnpressedTexture();
+    Texture getUnpressedTexture();
 
     int getX();
     int getY();
