@@ -3,97 +3,105 @@
 
 using namespace std;
 
-CharMan::CharMan() : list(), delist(),currentlyControlled(NULL) {}
+CharMan::CharMan() : list(), currentlyControlled(-1) {}
 
-CharMan::~CharMan() {
-    for (auto it = list.begin(); it != list.end(); it++) {
-        delete *it;
+
+void CharMan::removeChar(int toRemove) {
+    Character &c=list[toRemove];
+    if (c.isPlayerControlled()) {
+        revokeCharacterControl();
     }
-    list.clear();
+    else if (toRemove<currentlyControlled) {
+        currentlyControlled--;
+    }
+    list.erase(list.begin()+toRemove);
 }
+void CharMan::handleDeletions() {
+    for (int i=0;i<(int)list.size();i++) {
+        if (list[i].shouldDelete()){
+            std::cout<<"Removing character "<<i<<". currentlyControlled is "<<currentlyControlled<<". list.size()="<<list.size()<<std::endl;
 
-void CharMan::addChar(double x,double y,float velcap,float acc,Texture img,Sound death,bool assignControl) {
-    /*Sound *deathSound = new Sound();
-    deathSound.load(death); */
-    Character *newChar = new TestCharacter(x,y,velcap,acc,img,death);
-    list.push_back(newChar);
-    if (assignControl)
-        currentlyControlled = newChar;
-}
+            removeChar(i);
 
-void CharMan::removeChar(Character * toRemove) {
-    //right now we can just take no arg and kill controlled unit
-    if (!toRemove)
-        toRemove = currentlyControlled;
-    for (auto it = list.begin(); it != list.end(); it++) {
-        if (*it == toRemove) {
-            //check if we just killed controlled unit.. if so toggle
-            if (toRemove == currentlyControlled)
-                toggleControl();
-
-            //was that the only character? if so, set ptr to null
-            //check if we just killed controlled unit.. if so toggle
-            if (toRemove == currentlyControlled)
-                currentlyControlled = NULL;
-
-            //death sound and then delete
-            (*it)->deathSound.play();
-            delist.push_back(*it);
-            list.erase(it);
-            break;
+            std::cout<<"Removed character "<<i<<". currentlyControlled is "<<currentlyControlled<<". list.size()="<<list.size()<<std::endl;
+            i--;
+            
         }
     }
 }
-
-/*
-*	Performs final death sounds + animations(later on) before removing from map.
-*/
-void CharMan::toDelete() {
-    if (delist.size() > 0) {
-        if (!(delist[0]->deathSound.playing())) {
-            std::cout << "this ran" << std::endl;
-            delete delist[0];
-            delist.erase(delist.begin());
-        }
+size_t CharMan::size() const {
+    return list.size();
+}
+void CharMan::revokeCharacterControl() {
+    if (currentlyControlled>-1) {
+        Character &c2=list[currentlyControlled];
+        if (!c2.isPlayerControlled())
+            cout<<"Error in CharMan::revokeCharacterControl! A Character thinks it's currently controlled but CharMan says it isn't!"<<endl;
+        c2.setPlayerControlled(false);
+        currentlyControlled=-1;
     }
 }
 
-void CharMan::timestep(double dt,GSArena *gs) {
+void CharMan::addChar(const Character &arg, bool assignControl) {
+    list.push_back(arg);
+    Character &c=list[list.size()-1];
+    c.setPlayerControlled(assignControl);
+    if (assignControl) {
+        revokeCharacterControl();
+        currentlyControlled = (int)list.size()-1;
+    }
+}
+
+void CharMan::timestep(double dt,GSArena *const gs) {
     for (auto it = list.begin(); it != list.end(); it++) {
         (*it)->timestep(dt,gs);
     }
+    handleDeletions();
 }
 
-void CharMan::handleEvent(SDL_Event *e,GSArena *gs) {
+void CharMan::handleEvent(SDL_Event *e,GSArena *const gs) {
     //only take keyboard input for current controllable unit
-    if (currentlyControlled)
-        currentlyControlled->handleEvent(e,gs);
+    if (currentlyControlled>=0)
+        list[currentlyControlled].handleEvent(e,gs);
 }
 
-void CharMan::render(const Camera& cam) {
+void CharMan::render(Camera& cam) {
     for (auto it = list.begin(); it != list.end(); it++) {
         (*it)->render(cam);
     }
-    toDelete();
 }
 
-void CharMan::toggleControl() {
+bool CharMan::switchControl() {
+    std::cout<<"Switching Control"<<std::endl;
     //check to make sure valid controllable unit present
     if (list.size() == 0)
-        return;
-    //just toggle to next available in list
-    for (auto it = list.begin(); it != list.end(); it++) {
-        if (*it == currentlyControlled) {
-            if (++it == list.end())
-                currentlyControlled = *(list.begin());
-            else
-                currentlyControlled = *it;
-            break;
-        }
+        return false;
+
+    //Some code to find the next available non-dead
+    int newcontrol=(currentlyControlled+1)%list.size();
+    int firstIndex=newcontrol;
+    bool firststep=true;
+    while ((list[newcontrol].isDead()||list[newcontrol].shouldDelete()) && (newcontrol!=firstIndex || firststep)) {
+        newcontrol=(newcontrol+1)%list.size();
+        firststep=false;
     }
+    std::cout<<"newcontrol="<<newcontrol<<". firstindex="<<firstIndex<<". firststep="<<firststep<<std::endl;
+    if (newcontrol==currentlyControlled)
+        return false;
+    //else we've found a valid, not dead, not "shouldDelete"able character to control.
+
+    revokeCharacterControl();
+    currentlyControlled=newcontrol;
+    list[currentlyControlled].setPlayerControlled(true);
+    return true;
 }
-bool CharMan::gameOver() {
+bool CharMan::isGameOver() {
     return !(list.size() > 0);
+}
+void CharMan::killActiveCharacter() {
+    if (currentlyControlled<0)
+        return;
+    list[currentlyControlled].kill();
 }
 
 /*
@@ -143,7 +151,7 @@ void ArenaMap::loadEmptyMap(int circleradius) {
     resizeTileArrays();
     for (int i=0;i<ntiles;i++)
         for (int j=0;j<ntiles;j++)
-            if ((i-circleradius-0.5)*(i-circleradius-0.5)+(j-circleradius-0.5)*(j-circleradius-0.5) < (circleradius-2)*(circleradius-2))
+            if (double(i-circleradius-0.5)*(i-circleradius-0.5)+double(j-circleradius-0.5)*(j-circleradius-0.5) < double(circleradius-2)*(circleradius-2))
                 tiles[i][j]=0;
             else
                 tiles[i][j]=-1;
@@ -288,19 +296,19 @@ void GSArena::initialize() {
     //test character
     //xcoord, ycoord, vel cap, acc
     Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
-    charman.addChar(3,3,3,3,charactertexture,Sound(),true);
-    charman.addChar(3,10,3,3,charactertexture,Sound());
-    charman.addChar(10,3,3,3,charactertexture,Sound());
-    charman.addChar(10,10,3,3,charactertexture,Sound());
+    charman.addChar(TestCharacter(3,3,3,3,charactertexture,Sound()),true);
+    charman.addChar(TestCharacter(3,10,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(10,3,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(10,10,3,3,charactertexture,Sound()));
 }
 
 void GSArena::reset() {
     charman=CharMan();
     Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
-    charman.addChar(3,3,3,3,charactertexture,Sound(),true);
-    charman.addChar(3,10,3,3,charactertexture,Sound());
-    charman.addChar(10,3,3,3,charactertexture,Sound());
-    charman.addChar(10,10,3,3,charactertexture,Sound());
+    charman.addChar(TestCharacter(3,3,3,3,charactertexture,Sound()),true);
+    charman.addChar(TestCharacter(3,10,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(10,3,3,3,charactertexture,Sound()));
+    charman.addChar(TestCharacter(10,10,3,3,charactertexture,Sound()));
 }
 
 //Timestep. Calls timestep on the current active game state.
@@ -323,11 +331,12 @@ void GSArena::render() {
     resetButton.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {
-	if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_PERIOD)
-        charman.toggleControl();
-	else if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_k) {
-        charman.removeChar();
-		if (charman.gameOver()) {
+	if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_PERIOD)
+        charman.switchControl();
+	else if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_k) {
+        charman.killActiveCharacter();
+        charman.switchControl();
+		if (charman.isGameOver()) {
 			gameOver = true;
 			//do gameOver rendering stuff somewhere TODO
 		}

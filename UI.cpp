@@ -166,7 +166,7 @@ int AudioWidget::getSoundLevel() {
     soundchanged=false;
     if (toggle)
         return soundlevel;
-    return false;
+    return 0;
 }
 //Check if soundlevel has been changed since getSoundLevel was last read.
 bool AudioWidget::soundLevelChanged() {

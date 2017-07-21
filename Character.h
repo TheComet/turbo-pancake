@@ -10,6 +10,11 @@ class Character {
 protected: 
 
     virtual Character* unsafe_copy() const =0;
+
+    bool isdead; // true if the character is dead and should no longer be controlled by the player
+    bool shoulddelete; //true if the character is done drawing and doing w/e and should be removed/deallocated from gameplay.
+    bool playercontrolled; //true if the caller is passing player control on to the character.
+
 public:
     Sound deathSound;
 
@@ -19,6 +24,16 @@ public:
 	virtual void timestep(double dt,GSArena *gs)=0;
 	virtual void handleEvent(SDL_Event *e, GSArena *gs)=0;
 	virtual void render(const Camera& arg)=0;
+
+    //getters and setters for determining if a character is dead/ready to be deleted/player controlled.
+    virtual bool isDead() const;
+    virtual bool shouldDelete() const;
+    virtual void setDead(bool arg);
+    virtual void setDelete(bool arg);
+    virtual bool isPlayerControlled() const;
+    virtual void setPlayerControlled(bool arg);
+    virtual void kill();
+
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;
@@ -34,16 +49,18 @@ class TestCharacter : public Character {
     Texture t;
     bool controlled;
 
-    //So that CharacterList has access to unsafe_copy
-    TestCharacter* unsafe_copy() const;
+    TestCharacter* unsafe_copy() const override;
 
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
 	~TestCharacter() {}
-	void timestep(double dt, GSArena *gs);
-	void handleEvent(SDL_Event *e, GSArena *gs);
-	void render(const Camera& arg);
+ 
 
+    void timestep(double dt, GSArena *gs) override;
+	void handleEvent(SDL_Event *e, GSArena *gs) override;
+	void render(const Camera& arg) override;
+
+    //So that CharacterList has access to unsafe_copy
     friend class CharacterList;
 };
 
@@ -78,5 +95,8 @@ public:
     iterator begin();
     iterator end();
     void erase(iterator pt);
+    void eraseNth(int n);
     void push_back(const Character& arg);
+    void clear();
+
 };

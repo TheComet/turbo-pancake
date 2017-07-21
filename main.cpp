@@ -185,14 +185,6 @@ int main(int argc,char* args[]) {
             g.adown=(keyboardState[SDL_SCANCODE_A]==1);
             g.sdown=(keyboardState[SDL_SCANCODE_S]==1);
             g.ddown=(keyboardState[SDL_SCANCODE_D]==1);
-            if (g.wdown)
-                cout<<"w down"<<endl;
-            if (g.adown)
-                cout<<"a down"<<endl;
-            if (g.sdown)
-                cout<<"s down"<<endl;
-            if (g.ddown)
-                cout<<"d down"<<endl;
 
             
             SDL_GetMouseState(&g.mousex,&g.mousey);

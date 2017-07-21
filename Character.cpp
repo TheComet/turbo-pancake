@@ -1,18 +1,21 @@
 #include "Character.h"
 
 
-Character::Character() : deathSound() { }
+Character::Character() : deathSound() ,isdead(false),shoulddelete(false),playercontrolled(false) { }
 
+bool Character::isDead()  const { return isdead; }
+bool Character::shouldDelete()  const { return shoulddelete;  }
+void Character::setDead(bool arg) { isdead=arg;  }
+void Character::setDelete(bool arg) { shoulddelete=arg; }
+bool Character::isPlayerControlled() const { return playercontrolled; }
+void Character::setPlayerControlled(bool arg) { playercontrolled=arg; }
+void Character::kill() { setDead(true); setDelete(true); }
 
 TestCharacter* TestCharacter::unsafe_copy() const{
     return new TestCharacter(*this);
 }
 
-TestCharacter::TestCharacter(double x,double y, float velcap, float acc, Texture img, Sound death) : Character(), acc(),accMagnitude(0),vel(),pos(),speedcap(0),t(),controlled(false)  {
-    pos=Vector2(x,y);
-	speedcap = velcap;
-	accMagnitude = acc;
-	t = img;
+TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(), acc(),accMagnitude(acceleration),vel(),pos(x,y),speedcap(velcap),t(img),controlled(false)  {
 	deathSound = death;
 }
 
@@ -86,6 +89,7 @@ CharacterList& CharacterList::operator=(const CharacterList &arg) {
     //If we haven't been assigned to ourself, we can copy and free.
     free();
     list=arg.unsafe_copy();
+    return *this;
 }
 CharacterList::~CharacterList() {
     free();
@@ -113,7 +117,16 @@ CharacterList::iterator CharacterList::end() {
 }
 void CharacterList::erase(iterator pt) {
     delete *pt;
+    list.erase(pt);
+}
+void CharacterList::eraseNth(int n) {
+    CharacterList::iterator pt=list.begin()+n;
+    delete *pt;
+    list.erase(pt);
 }
 void CharacterList::push_back(const Character& arg) {
     list.push_back(arg.unsafe_copy());
+}
+void CharacterList::clear() {
+    free();
 }

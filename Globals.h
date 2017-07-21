@@ -24,7 +24,7 @@ struct Globals {
 
     bool quit; //false is keep running, true is "quit asap".
 
-    Globals() : scWidth(640),scHeight(480),window(NULL),renderer(NULL),font16(NULL),font28(NULL),quit(false) {}
+    Globals() : scWidth(640),scHeight(480),window(nullptr),renderer(nullptr),font16(nullptr),font28(nullptr),font16bold(nullptr),defaultClickSound(),mousex(0),mousey(0),wdown(false),adown(false),sdown(false),ddown(false),mousefocus(false),keyboardfocus(false),quit(false) {}
 };
 
 extern Globals g;

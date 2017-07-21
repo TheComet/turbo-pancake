@@ -18,7 +18,9 @@ class Texture {
 	void free(); //properly deallocate mTexture
 public:
 	Texture();
-
+    /*~Texture(){
+        std::cout<<"ptr: "<<mTexture.get()<<std::endl;
+    }*/
 	bool load(std::string path);
 
 	//Use SDL_ttf 2.0 to render text to a texture. 

@@ -1,16 +1,14 @@
 #include "GameMan.h"
 #include <iostream>
 
-
-GameMan::GameMan() : gsmain(),gsnoot(),state(gsEnum::mainmenu),audio(10,10) {}
+GameMan::GameMan() : gsmain(),gsnoot(), gsoptions(),gsarena(),state(gsEnum::mainmenu),audio(10,10) {}
 
 //Load & initialize internal state.
 void GameMan::initialize() {
     gsmain.initialize();
     gsnoot.initialize();
     gsoptions.initialize();
-    gsarena.initialize();
-
+    //gsarena.initialize();
 }
 
 //Timestep. Calls timestep on the current active game state.

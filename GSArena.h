@@ -10,21 +10,45 @@
 class GSArena;
 
 class CharMan {
-    std::vector<Character *> list;
-    std::vector<Character *> delist;
-    Character *currentlyControlled;
+    //list of Characters. These could be active, playing death animations, or player controlled.
+    CharacterList list;
+
+    //Index of the currently controlled character. As above, if currentlyControlled=4 and we call removeChar(3), 
+    //currentlyControlled is updated to 3 after the character is removed.
+    int currentlyControlled;
+
+    //remove the character at the given array index.
+    void removeChar(int toRemove);
+
+    //removes everything in indicesToDelete.
+    void handleDeletions();
+
+    //getters:
+    size_t size() const;//returns list.size();
+
+    //update list[currentlyControlled] to say it isn't character controlled and set 
+    //currentlyControlled to -1.
+    void revokeCharacterControl();
 public:
+    //Do nothing constructor
     CharMan();
-    CharMan(const CharMan& other) {}
-    ~CharMan();
-    void addChar(double x = 0,double y = 0,float velcap = 0,float acc = 0,Texture img = Texture(),Sound death = Sound(),bool assignControl = false);
-    void removeChar(Character *toRemove = NULL);
-    void timestep(double dt,GSArena *gs);
-    void handleEvent(SDL_Event *e,GSArena *gs);
-    void toggleControl();
-    void toDelete();
-    bool gameOver();
-    void render(const Camera& arg);
+
+    //Add a character. If assignControl is true, control is switched to this new character. 
+    void addChar(const Character& chr, bool assignControl=false);
+
+    //core game logic:
+    void timestep(double dt,GSArena *const gs);
+    void handleEvent(SDL_Event *e,GSArena *const gs);
+    void render(Camera& arg);
+
+    void killActiveCharacter();
+
+    //Switches control to the next Character in charMan.
+    //Returns true if you switched, false if there was no switch.
+    bool switchControl();
+
+    //returns true in a game over scenario: like if all the characters are dead.
+    bool isGameOver();
 };
 
 class ArenaMap {

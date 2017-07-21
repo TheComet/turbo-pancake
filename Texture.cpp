@@ -9,8 +9,6 @@ Texture::Texture() : mTexture(nullptr), width(0), height(0) {}
 
 
 bool Texture::load(string path) {
-	//The final texture
-	SDL_Texture* newTexture = nullptr;
 
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
@@ -20,7 +18,7 @@ bool Texture::load(string path) {
 	}
 
 	//Create texture from surface pixels
-	newTexture = SDL_CreateTextureFromSurface(g.renderer, loadedSurface);
+    SDL_Texture* newTexture = SDL_CreateTextureFromSurface(g.renderer, loadedSurface);
 	if (newTexture == nullptr) {
         cout<<"Unable to create texture from "<<path<<"! "<<SDL_GetError()<<endl;
         return false;
