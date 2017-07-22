@@ -38,6 +38,9 @@ class ArenaMap {
 
     //Loads a square with holes into it into the map.
     void addHouseShape(int x=0,int y=0, int w=3, int h=3);
+
+    Texture team1spawn;
+    Texture team2spawn;
 public:
 
     ArenaMap();
@@ -58,6 +61,9 @@ public:
 
     //draw the map according to the Camera's position and orientation.
     void render(Camera& cam);
+    void renderSpawns(Camera& cam);
+    void setTile(int x,int y,Tiles tiletype);
+    void setSpawn(int x,int y,int team);
 
     //returns this->ntiles.
     int getNTiles();

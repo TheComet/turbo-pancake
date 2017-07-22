@@ -50,18 +50,25 @@ bool Button::mouseIsOverButton() {
 
 void Button::render() {
     if (mouseIsOverButton()) {
-        pressedTexture.render(xpos,ypos+deltay);
-        if (!text.isNull()) {
-            textshadow.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2+1,ypos+pressedTexture.getHeight()/2-text.getHeight()/2+deltay+1);
-            text.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2,ypos+pressedTexture.getHeight()/2-text.getHeight()/2+deltay);
-        }
+        renderPressed();
     }
     else {
-        unpressedTexture.render(xpos,ypos);
-        if (!text.isNull()) {
-            textshadow.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2+2,ypos+pressedTexture.getHeight()/2-text.getHeight()/2+2);
-            text.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2,ypos+pressedTexture.getHeight()/2-text.getHeight()/2);
-        }
+        renderUnpressed();
+    }
+}
+
+void Button::renderPressed() {
+    pressedTexture.render(xpos,ypos+deltay);
+    if (!text.isNull()) {
+        textshadow.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2+1,ypos+pressedTexture.getHeight()/2-text.getHeight()/2+deltay+1);
+        text.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2,ypos+pressedTexture.getHeight()/2-text.getHeight()/2+deltay);
+    }
+}
+void Button::renderUnpressed() {
+    unpressedTexture.render(xpos,ypos);
+    if (!text.isNull()) {
+        textshadow.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2+2,ypos+pressedTexture.getHeight()/2-text.getHeight()/2+2);
+        text.render(xpos+pressedTexture.getWidth()/2-text.getWidth()/2,ypos+pressedTexture.getHeight()/2-text.getHeight()/2);
     }
 }
 
@@ -128,8 +135,72 @@ int Button::getX() {
 int Button::getY() {
     return ypos;
 }
+int Button::getDeltay() {
+    return deltay;
+}
 
+//Null initializer: textures are empty.
+ToggleButton::ToggleButton() : b(),icon(),stateChanged(false),state(false) { }
 
+//Initialize the button. x and y are the coordinates of the top left of the button texture.
+//If text is left to "", no text will be displayed over the button.
+//This initializer will set the click sound to g.defaultClickSound. 
+ToggleButton::ToggleButton(int x,int y,Texture ptexture,Texture utexture,std::string text,Texture uicon)
+: b(x,y,ptexture,utexture,text), icon(uicon),stateChanged(false),state(false){ }
+
+//Initialize the button. x and y are the coordinates of the top left of the button texture.
+//This initializer will set the click sound to the argument. If the argument is the empty sound Sound(), the button will be silent. 
+ToggleButton::ToggleButton(int x,int y,Texture ptexture,Texture utexture,std::string text,Texture uicon,Sound uclicksound) : b(x,y,ptexture,utexture,text,uclicksound),icon(uicon),stateChanged(false),state(false) { }
+
+void ToggleButton::setState(bool arg) {
+    state=arg;
+    stateChanged=true;
+}
+
+//Setters
+void ToggleButton::setPos(int x,int y) { b.setPos(x,y); }
+void ToggleButton::setPos(double x,int y) { b.setPos(x,y); }
+void ToggleButton::setPos(int x,double y) { b.setPos(x,y); }
+void ToggleButton::setPos(double x,double y) { b.setPos(x,y); }
+void ToggleButton::setdeltay(int dy) { b.setdeltay(dy); }
+
+void ToggleButton::setAlpha(Uint8 alpha) { b.setAlpha(alpha); icon.setAlpha(alpha); }
+
+//Basic necessities
+void ToggleButton::render() { 
+    int dy=0;
+    if (state) {
+        b.renderPressed();
+        dy=b.getDeltay();
+    }
+    else {
+        b.renderUnpressed();
+    }
+    if (icon) {
+        icon.render(b.getX()+b.getUnpressedTexture().getWidth()/2-icon.getWidth()/2,
+            b.getY()+b.getUnpressedTexture().getHeight()/2-icon.getHeight()/2+dy);
+    }
+
+    if (b.isPressed()) {
+        stateChanged=true;
+        state=!state;
+        b.pressReceived();
+    }
+}
+
+bool ToggleButton::wasUpdated() { return stateChanged; }
+void ToggleButton::updateReceived() { stateChanged=false; }
+bool ToggleButton::getState() { return state; }
+
+//handleEvent returns true if mouse input was "captured" by the GUI element.
+//This can be used by Game States or other utilities to eg realize a mouse
+//clicked a button and not the map!
+bool ToggleButton::handleEvent(SDL_Event* e) { return b.handleEvent(e); }
+void ToggleButton::playSound() { b.playSound(); }
+Texture ToggleButton::getUnpressedTexture() { return b.getUnpressedTexture(); }
+int ToggleButton::getX() { return b.getY(); }
+int ToggleButton::getY() { return b.getX();  }
+int ToggleButton::getDeltay() { return b.getDeltay(); }
 
 
 

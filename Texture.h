@@ -53,6 +53,9 @@ public:
 	int getHeight();
     bool isNull();
 
+    //So we can call if(texture). Texturec converts to bool and is false whenever mTexture==nullptr. 
+    explicit operator bool();
+
 };
 
 Texture loadTexture(std::string filename);

@@ -159,6 +159,9 @@ int Texture::getHeight() {
 bool Texture::isNull() {
     return mTexture == nullptr;
 }
+Texture::operator bool() {
+    return mTexture != nullptr;
+}
 
 Texture loadTexture(std::string filename){
 	Texture t;

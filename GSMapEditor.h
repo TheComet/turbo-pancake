@@ -6,13 +6,20 @@
 class GSMapEditor
 {
     Button back;
+    Texture toggleBackground; 
+    std::vector<ToggleButton> togglers;
+
+    int editorx,editory;
+    int editorpaint;
+
+    void updateEditorPaint();
 
     int stateChange; //0 if no state change should occur, 1 if we're changing to main menu    
 
     bool leftclickheld;
     bool rightclickheld;
-    int xtilelast=0;
-    int ytilelast=0;
+    int xtilelast;
+    int ytilelast;
 public:
     ArenaMap map;
     Camera cam;

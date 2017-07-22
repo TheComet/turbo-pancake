@@ -16,9 +16,9 @@ class Button
 
     Sound soundEffect; //sound to be played on click
 
-    bool mouseIsOverButton();
 
 public:
+    bool mouseIsOverButton();
     //Null initializer: textures are empty.
     Button();
 
@@ -42,6 +42,9 @@ public:
 
     //Basic necessities
     void render();
+    //Basic necessities
+    void renderPressed();
+    void renderUnpressed();
 
     //handleEvent returns true if mouse input was "captured" by the GUI element.
     //This can be used by Game States or other utilities to eg realize a mouse
@@ -58,8 +61,61 @@ public:
 
     int getX();
     int getY();
+    int getDeltay();
 };
 
+class ToggleButton
+{
+    Button b;
+    Texture icon;
+
+
+    bool stateChanged;
+    bool state;
+public:
+    //Null initializer: textures are empty.
+    ToggleButton();
+
+    //Initialize the button. x and y are the coordinates of the top left of the button texture.
+    //If text is left to "", no text will be displayed over the button.
+    //This initializer will set the click sound to g.defaultClickSound. 
+    ToggleButton(int x,int y,Texture ptexture,Texture utexture,std::string text = "",Texture icon=Texture());
+
+    //Initialize the button. x and y are the coordinates of the top left of the button texture.
+    //This initializer will set the click sound to the argument. If the argument is the empty sound Sound(), the button will be silent. 
+    ToggleButton(int x,int y,Texture ptexture,Texture utexture,std::string text,Texture icon,Sound clicksound);
+
+    //Setters
+    void setPos(int x,int y);
+    void setPos(double x,int y);
+    void setPos(int x,double y);
+    void setPos(double x,double y);
+    void setdeltay(int dy);
+
+    void setAlpha(Uint8 alpha);
+
+    //Basic necessities
+    void render();
+
+    //handleEvent returns true if mouse input was "captured" by the GUI element.
+    //This can be used by Game States or other utilities to eg realize a mouse
+    //clicked a button and not the map!
+    bool handleEvent(SDL_Event* e);
+
+    //Clicky logic
+    bool wasUpdated();
+    void updateReceived();
+    void setState(bool arg);
+    bool getState();
+
+    void playSound();
+
+    Texture getUnpressedTexture();
+
+    int getX();
+    int getY();
+    int getDeltay();
+};
 
 class AudioWidget {
     //Audio speaker graphic: 0 bars, 1 bar, 2 bars, 3 bars.

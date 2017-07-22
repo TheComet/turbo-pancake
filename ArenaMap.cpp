@@ -22,6 +22,8 @@ void ArenaMap::initialize() {
     tiletextures.push_back(loadTexture("media/1110wall.png"));
     tiletextures.push_back(loadTexture("media/1111wall.png"));
     createCircleMap(13);
+    team1spawn=loadTexture("media/team1spawn.png");
+    team2spawn=loadTexture("media/team2spawn.png");
 }
 void ArenaMap::resetMap() {
     tiles=vector<vector<MapTile> >(ntiles,(vector<MapTile>(ntiles,MapTile())));
@@ -164,6 +166,20 @@ void ArenaMap::eraseWall(int x,int y) {
     tiles[x][y].wall=Tiles::empty;
     recalculateTextures();
 }
+void ArenaMap::setTile(int x,int y,Tiles tiletype) {
+    if (!isInBounds(x,y))
+        return;
+    tiles[x][y].ground=tiletype;
+    if(tiletype==Tiles::dirt)
+        tiles[x][y].groundtexture=0;
+    else
+        tiles[x][y].groundtexture=-1;
+}
+void ArenaMap::setSpawn(int x,int y,int team) {
+    if (!isInBounds(x,y))
+        return;
+    tiles[x][y].spawnteam=team;
+}
 
 //returns all tiles that have the spawnable flag set to true.
 std::vector<IntegerPoint> ArenaMap::getSpawnablePoints(int team) {
@@ -222,6 +238,17 @@ void ArenaMap::render(Camera& cam) {
             if (tiles[i][j].walltexture>=0) {
                 Texture &t=tiletextures[tiles[i][j].walltexture];
                 cam.renderTile(t,i,j,1);
+            }
+        }
+    }
+}
+void ArenaMap::renderSpawns(Camera& cam) {
+    for (int i=0;i<ntiles;i++) {
+        for (int j=0;j<ntiles;j++) {
+            if (tiles[i][j].spawnteam==0) {
+                cam.renderTile(team1spawn,i,j,1);
+            } else  if (tiles[i][j].spawnteam==1) {
+                cam.renderTile(team2spawn,i,j,1);
             }
         }
     }
