@@ -15,16 +15,21 @@ class Camera {
     Vector2 lastpos;//x and y the last frame. Used for calculating final velocity. 
 
     bool dragging; //true if the mouse has been clicked and held.
+    int dragbutton; //-1 if any mouse click, 0 if left click, 1 if right click, 2 if middle click.
     double lastdt;
 public:
     Camera();
+
+    Vector2 worldToPixels(Vector2 w);
+    Vector2 pixelsToWorld(Vector2 p);
+
 
     //Ensures that the point at (x,y) is at the center of the screen.
     //Note that the center of the tile at (0,0) has coordinates (0.5,0.5).
     void centerCameraOnTile(double x,double y);
 
-    void toggleCameraDraggable(); //draggable=!draggable
-    void setDraggable(); //draggable=true
+    void setDraggable(bool arg=true); //draggable=true
+    void setDragButton(int arg=-1); //-1 if any mouse click, 0 if left click, 1 if right click, 2 if middle click.
     bool getCameraDraggable(); //return draggable
 
     //Core things: events & movement!

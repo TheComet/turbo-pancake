@@ -152,7 +152,16 @@ void ArenaMap::addHouseShape(int x,int y,int w,int h) {
 
 //puts a wall at x,y and updates the map.
 void ArenaMap::addWall(int x,int y) {
+    if (!isInBounds(x,y))
+        return;
     tiles[x][y].wall=Tiles::wall;
+    recalculateTextures();
+}
+//puts a wall at x,y and updates the map.
+void ArenaMap::eraseWall(int x,int y) {
+    if (!isInBounds(x,y))
+        return;
+    tiles[x][y].wall=Tiles::empty;
     recalculateTextures();
 }
 

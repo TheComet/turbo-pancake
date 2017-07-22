@@ -9,6 +9,7 @@ void GameMan::initialize() {
     gsnoot.initialize();
     gsoptions.initialize();
     gsarena.initialize();
+    gsmapeditor.initialize();
 }
 
 //Timestep. Calls timestep on the current active game state.
@@ -26,6 +27,10 @@ void GameMan::timestep(double dt) {
                 gsoptions.fadeIn();
             } else if (statechange==3) { //If GSMainMenu requests a state change to "noot", fade out & change our state flag accordingly.
                 state=gsEnum::menutonoot;
+                gsmain.fadeOut();
+            }
+            else if (statechange==4) { //If GSMainMenu requests a state change to "mapeditor", fade out & change our state flag accordingly.
+                state=gsEnum::menutomapedit;
                 gsmain.fadeOut();
             }
             //reset the stateChange variable so that if we wind back up at main menu, it won't immediately request a change.
@@ -101,6 +106,29 @@ void GameMan::timestep(double dt) {
             state=gsEnum::mainmenu;
         }
     }
+    /******************** Handle option transitions to and from state "mapeditor" *************************/
+    else if (state==gsEnum::menutomapedit) {
+        gsmain.timestep(dt);
+        gsmapeditor.timestep(dt);
+        if (gsmain.doneTransitioning()) {
+            state=gsEnum::mapedit;
+        }
+    }
+    else if (state==gsEnum::mapedit) {
+        gsmapeditor.timestep(dt);
+        if (gsmapeditor.getStateChange()==1) {
+            state=gsEnum::mapedittomenu;
+            gsmain.fadeIn();
+            gsmapeditor.resetStateChange();
+        }
+    }
+    else if (state==gsEnum::mapedittomenu) {
+        gsmain.timestep(dt);
+        gsmapeditor.timestep(dt);
+        if (gsmain.doneTransitioning()) {
+            state=gsEnum::mainmenu;
+        }
+    }
 }
 
 void GameMan::render() {
@@ -138,6 +166,17 @@ void GameMan::render() {
     }
     else if (state==gsEnum::arenatomenu) {
         gsarena.render();
+        gsmain.render();
+    }
+    else if (state==gsEnum::menutomapedit) {
+        gsmapeditor.render();
+        gsmain.render();
+    }
+    else if (state==gsEnum::mapedit) {
+        gsmapeditor.render();
+    }
+    else if (state==gsEnum::mapedittomenu) {
+        gsmapeditor.render();
         gsmain.render();
     }
 
@@ -183,6 +222,17 @@ void GameMan::handleEvent(SDL_Event *e) {
     }
     else if (state==gsEnum::arenatomenu) {
         gsarena.handleEvent(e);
+        gsmain.handleEvent(e);
+    }
+    else if (state==gsEnum::menutomapedit) {
+        gsmapeditor.handleEvent(e);
+        gsmain.handleEvent(e);
+    }
+    else if (state==gsEnum::mapedit) {
+        gsmapeditor.handleEvent(e);
+    }
+    else if (state==gsEnum::mapedittomenu) {
+        gsmapeditor.handleEvent(e);
         gsmain.handleEvent(e);
     }
     if (audio.soundLevelChanged()) {

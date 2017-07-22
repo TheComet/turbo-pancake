@@ -2,7 +2,7 @@
 #include <cmath>  
 
 
-Camera::Camera () : pos(), multiplier(50),cameradraggable(false),v(),drag(10),maxv(200),mousedragpos(),lastpos(),dragging(false),lastdt(0.01) { }
+Camera::Camera () : pos(), multiplier(50),cameradraggable(false),v(),drag(10),maxv(200),mousedragpos(),lastpos(),dragging(false),dragbutton(-1),lastdt(0.01) { }
 
 //Ensures that the point at (x,y) is at the center of the screen.
 //Note that the center of the tile at (0,0) has coordinates (0.5,0.5).
@@ -10,28 +10,54 @@ void Camera::centerCameraOnTile(double x,double y) {
     pos=Vector2(x,y);
 }
 
-void Camera::toggleCameraDraggable() {
-    cameradraggable=!cameradraggable;
+
+
+void Camera::setDragButton(int arg) {
+    if (arg!=dragbutton) {
+        dragging=false;
+        mousedragpos=mousedragpospixels=lastpos=Vector2();
+    }
+    dragbutton=arg;
+}
+
+void Camera::setDraggable(bool arg) { 
+    cameradraggable=arg;
     if (!cameradraggable) {
         dragging=false;
         mousedragpos=mousedragpospixels=lastpos=Vector2();
     }
-
 }
-void Camera::setDraggable() { cameradraggable=true;  }
 bool Camera::getCameraDraggable() {
     return cameradraggable;
 }
 
 //Core things: events & movement!
 bool Camera::handleEvent(SDL_Event *e) {
-    if (e->type == SDL_MOUSEBUTTONDOWN && cameradraggable) {
+    bool buttonclicked= (e->type==SDL_MOUSEBUTTONDOWN);
+    bool buttonreleased=(e->type==SDL_MOUSEBUTTONUP);
+    bool buttonmatches = false;
+    if (buttonclicked||buttonreleased) {
+        if (dragbutton==-1)
+            buttonmatches=true;
+        else if (dragbutton==0) {
+            buttonmatches=(e->button.button==SDL_BUTTON_LEFT);
+        }
+        else if (dragbutton==1) {
+            buttonmatches=(e->button.button==SDL_BUTTON_RIGHT);
+        }
+        else if (dragbutton==2) {
+            buttonmatches=(e->button.button==SDL_BUTTON_MIDDLE);
+        }
+    }
+
+
+    if (e->type == SDL_MOUSEBUTTONDOWN && buttonmatches && cameradraggable) {
         dragging=true;
         mousedragpos=pos;
         mousedragpospixels=Vector2(g.mousex,g.mousey);
         lastpos=pos;
         return true;
-    } else if (dragging && e->type == SDL_MOUSEBUTTONUP && cameradraggable) {
+    } else if (dragging && e->type == SDL_MOUSEBUTTONUP && buttonmatches && cameradraggable) {
         v=(pos-lastpos)/lastdt;
 
         dragging=false;
@@ -66,4 +92,10 @@ void Camera::renderTile(Texture &arg,double wx,double wy,double width) const {
     int pixeldy=(int)ceil((wy-pos.y+width)*width*multiplier+g.scHeight/2);
 
     arg.renderScaled(pixelx,pixely,pixelrx-pixelx,pixeldy-pixely);
+}
+Vector2 Camera::worldToPixels(Vector2 w) {
+    return Vector2((w.x-pos.x)*multiplier+g.scWidth/2,(w.y-pos.y)*multiplier+g.scHeight/2);
+}
+Vector2 Camera::pixelsToWorld(Vector2 p) {
+    return Vector2((p.x-g.scWidth/2)/multiplier+pos.x,(p.y-g.scHeight/2)/multiplier+pos.y);
 }

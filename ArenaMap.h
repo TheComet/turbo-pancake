@@ -44,6 +44,7 @@ public:
 
     //puts a wall at x,y and updates the map.
     void addWall(int x,int y);
+    void eraseWall(int x,int y);
 
     //returns all tiles that have the spawnable flag set to true.
     std::vector<IntegerPoint> getSpawnablePoints(int team);

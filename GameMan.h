@@ -7,6 +7,7 @@
 #include "GSNoot.h"
 #include "GSOptions.h"
 #include "GSArena.h"
+#include "GSMapEditor.h"
 #include "UI.h"
 
 //flags to determine what state we're in and if there's any transition going on.
@@ -20,7 +21,10 @@ enum gsEnum {
     optionstomenu,
     menutoarena,
     arena,
-    arenatomenu
+    arenatomenu,
+    menutomapedit,
+    mapedit,
+    mapedittomenu
 };
 
 /*
@@ -35,6 +39,7 @@ class GameMan {
     GSNoot gsnoot; 
     GSOptions gsoptions;
     GSArena gsarena;
+    GSMapEditor gsmapeditor;
     
     gsEnum state;
     AudioWidget audio;

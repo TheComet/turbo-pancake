@@ -5,7 +5,7 @@
 
 
 
-GSMainMenu::GSMainMenu() : arena(),options(),noot(),backgroundimage(),transitionstate(1),transitionstarttime(0), stateChange(0) { }
+GSMainMenu::GSMainMenu() : arena(),options(),mapeditor(), noot(),backgroundimage(),transitionstate(1),transitionstarttime(0), stateChange(0) { }
 
 int GSMainMenu::getStateChange() {
     return stateChange;
@@ -26,7 +26,8 @@ void GSMainMenu::initialize() {
     int dy=p.getHeight()+30;
     arena=Button(x,y0,p,up,"Arena!");
     options=Button(x,y0+dy,p,up,"Options!!");
-    noot=Button(x,y0+2*dy,p,up,"NOOT?!1");
+    mapeditor=Button(x,y0+2*dy,p,up,"Map Editor");
+    noot=Button(x,y0+3*dy,p,up,"NOOT?!1");
 
     //Load the main screen image
     backgroundimage=loadTexture("media/mainscreen.png");
@@ -66,8 +67,13 @@ void GSMainMenu::timestep(double dt) {
             menumusic.fadeOut();
             noot.pressReceived();
         }
+        //If noot button is pressed, fade out music and signal that we should have a state change
+        if (mapeditor.isPressed()) {
+            stateChange=4;
+            menumusic.fadeOut();
+            mapeditor.pressReceived();
+        }
     } else if (transitionstate==2) {
-
 		if (SDL_GetTicks() - transitionstarttime > transitionduration) {
 			transitionstate = 3;
             backgroundimage.setAlpha(0);
@@ -81,6 +87,7 @@ void GSMainMenu::render() {
         backgroundimage.render(g.scWidth/2-backgroundimage.getWidth()/2,g.scHeight/2-backgroundimage.getHeight()/2);
         arena.render();
         options.render();
+        mapeditor.render();
         noot.render();
 
     } else if (transitionstate==2) { 
@@ -119,7 +126,9 @@ void GSMainMenu::render() {
         arena.render();
         options.setPos(x,y0+dy-t*ytrans);
         options.render();
-        noot.setPos(x,y0+2*dy-t*ytrans);
+        mapeditor.setPos(x,y0+2*dy-t*ytrans);
+        mapeditor.render();
+        noot.setPos(x,y0+3*dy-t*ytrans);
         noot.render();
     } else if (transitionstate==0) {
         //Play the fading in animation
@@ -158,7 +167,9 @@ void GSMainMenu::render() {
         arena.render();
         options.setPos(x,y0+dy-t*ytrans);
         options.render();
-        noot.setPos(x,y0+2*dy-t*ytrans);
+        mapeditor.setPos(x,y0+2*dy-t*ytrans);
+        mapeditor.render();
+        noot.setPos(x,y0+3*dy-t*ytrans);
         noot.render();
     }
 }
@@ -167,6 +178,7 @@ void GSMainMenu::handleEvent(SDL_Event *e) {
     if (transitionstate==1) {
         arena.handleEvent(e);
         options.handleEvent(e);
+        mapeditor.handleEvent(e);
         noot.handleEvent(e);
     }
 }
@@ -194,5 +206,6 @@ void GSMainMenu::windowResized() {
     int dy=arena.getUnpressedTexture().getHeight()+30;
     arena.setPos(x,y0);
     options.setPos(x,y0+dy);
-    noot.setPos(x,y0+2*dy);
+    mapeditor.setPos(x,y0+2*dy);
+    noot.setPos(x,y0+3*dy);
 }

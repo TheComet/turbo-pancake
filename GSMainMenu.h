@@ -6,6 +6,7 @@ class GSMainMenu
     //Main menu options
     Button arena;
     Button options;
+    Button mapeditor;
     Button noot;
 
     Music menumusic;
@@ -18,7 +19,7 @@ class GSMainMenu
     Uint32 transitionstarttime;
     const Uint32 transitionduration=1000; //1 second transitions
 
-    int stateChange; //0 if no state change should occur, 1 if we're changing to arena, 2 if options, 3 if noot.
+    int stateChange; //0 if no state change should occur, 1 if we're changing to arena, 2 if options, 3 if noot, 4 if mapeditor
 
 public:
     GSMainMenu();
