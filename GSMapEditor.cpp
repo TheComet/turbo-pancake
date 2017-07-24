@@ -20,7 +20,6 @@ void GSMapEditor::initialize() {
     int dx0=15;
     int yshift=-4;
 
-
     Texture tp=loadTexture("media/grey_button09.png");
     Texture tup=loadTexture("media/grey_button08.png");
 
