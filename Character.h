@@ -15,17 +15,36 @@ protected:
     bool shoulddelete; //true if the character is done drawing and doing w/e and should be removed/deallocated from gameplay.
     bool playercontrolled; //true if the caller is passing player control on to the character.
 
+
+    bool playerIsMovingUp;
+    bool playerIsMovingDown;
+    bool playerIsMovingRight;
+    bool playerIsMovingLeft;
 public:
     Sound deathSound;
 
     Character();
 
 	//virtual Geometry *getGeometry()=0;
-	virtual void timestep(double dt,GSArena *gs)=0;
-	virtual void handleEvent(SDL_Event *e, GSArena *gs)=0;
+	virtual void timestep(double dt,GSArena *gs);
+	virtual void handleEvent(SDL_Event *e, GSArena *gs); //default implementation passes stuff to move.
 	virtual void render(const Camera& arg)=0;
 
+    //The idea with this movement interface is that you should be able to control
+    //any type of creature! Maybe as an easter egg or something. So that if we make a 
+    //Mouse : public Character or a GiantGoliath : public Character, these can be 
+    //made player controllable with 0 extra coding effort!
+    virtual void moveRight()=0; //move in the positive x direction
+    virtual void moveLeft()=0; //move in the positive x direction
+    virtual void moveUp()=0; //move in the NEGATIVE y direction (screen space up!)
+    virtual void moveDown()=0; //move in the positive y direction
+    virtual void moveDir(double x, double y)=0; //move in a certain direction (magnitude is ignored)
+    virtual void lookAt(double x,double y)=0; //look at the world coordinate x,y.
+
     //getters and setters for determining if a character is dead/ready to be deleted/player controlled.
+    //an "isDead" character is not controllable, but may be playing some animation or doing some important work,
+    //so it can't be deleted yet. A "shouldDelete" character can be removed from memory. A isPlayerControlled
+    //character should have information passed to its event handler.
     virtual bool isDead() const;
     virtual bool shouldDelete() const;
     virtual void setDead(bool arg);
@@ -54,11 +73,17 @@ class TestCharacter : public Character {
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
 	~TestCharacter() {}
- 
 
     void timestep(double dt, GSArena *gs) override;
 	void handleEvent(SDL_Event *e, GSArena *gs) override;
 	void render(const Camera& arg) override;
+
+    void moveRight(); //move in the positive x direction
+    void moveLeft(); //move in the positive x direction
+    void moveUp(); //move in the NEGATIVE y direction (screen space up!)
+    void moveDown(); //move in the positive y direction
+    void moveDir(double x,double y); //move in a certain direction (magnitude is ignored)
+    void lookAt(double x,double y); //look at the world coordinate x,y.
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;

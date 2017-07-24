@@ -1,7 +1,12 @@
 #include "Character.h"
 #include "GSArena.h"
 
-Character::Character() : deathSound() ,isdead(false),shoulddelete(false),playercontrolled(false) { }
+Character::Character() : deathSound() ,isdead(false),shoulddelete(false),
+playercontrolled(false),
+playerIsMovingUp(false),
+playerIsMovingDown(false),
+playerIsMovingRight(false),
+playerIsMovingLeft(false) { }
 
 bool Character::isDead()  const { return isdead; }
 bool Character::shouldDelete()  const { return shoulddelete;  }
@@ -10,6 +15,56 @@ void Character::setDelete(bool arg) { shoulddelete=arg; }
 bool Character::isPlayerControlled() const { return playercontrolled; }
 void Character::setPlayerControlled(bool arg) { playercontrolled=arg; }
 void Character::kill() { setDead(true); setDelete(true); }
+
+void Character::timestep(double dt,GSArena *gs) {
+    if (isPlayerControlled()) {
+        if (playerIsMovingUp)
+            moveUp();
+        if (playerIsMovingDown)
+            moveDown();
+        if(playerIsMovingRight)
+            moveRight();
+        if (playerIsMovingLeft)
+            moveLeft();
+    }
+}
+void Character::handleEvent(SDL_Event *e,GSArena *gs) {
+    if (e->type==SDL_KEYDOWN || e->type==SDL_KEYUP) {
+        playerIsMovingLeft=g.adown;
+        playerIsMovingRight=g.ddown;
+        playerIsMovingUp=g.wdown;
+        playerIsMovingDown=g.sdown;
+    }
+}
+
+void TestCharacter::moveRight() {
+    acc.x+=accMagnitude;
+    if (acc.length()>0)
+        acc=accMagnitude*acc.normalized();
+}
+void TestCharacter::moveLeft() {
+    acc.x-=accMagnitude;
+    if (acc.length()>0)
+        acc=accMagnitude*acc.normalized();
+}
+void TestCharacter::moveUp() {
+    acc.y-=accMagnitude;
+    if (acc.length()>0)
+        acc=accMagnitude*acc.normalized();
+}
+void TestCharacter::moveDown(){
+    acc.y+=accMagnitude;
+    if (acc.length()>0)
+        acc=accMagnitude*acc.normalized();
+}
+void TestCharacter::moveDir(double x,double y) {
+    acc=Vector2(x,y);
+    if (acc.length()>0)
+        acc=accMagnitude*acc.normalized();
+}
+void TestCharacter::lookAt(double x,double y) {
+
+}
 
 TestCharacter* TestCharacter::unsafe_copy() const{
     return new TestCharacter(*this);
@@ -20,6 +75,8 @@ TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration
 }
 
 void TestCharacter::timestep(double dt, GSArena *gs) {
+    Character::timestep(dt,gs);
+
     vel+=acc*dt;
     //0 the vector if it gets too small.
     if (vel.length()<0.0005)
@@ -31,25 +88,18 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
     //Apply friction.
     //This corresponds to viscous friction x''(t)=-friction*x'(t) instead of constant friction,
     //but we can tweak it if we want.
-    double friction=1;
-    vel=vel*fmax(1-friction*dt,0);
+    double friction=5;
+    if(acc.length2()<0.001)
+        vel=vel*fmax(1-friction*dt,0);
 
     //after final adjustments, move the character's coordinates
     pos+=vel*dt;
-    gs->map.circleMapCollide(pos,0.5);
+    gs->map.circleMapCollide(pos,0.47);
+    acc=Vector2(); //the character does not keep accelerating unless moveLeft is constantly called.
 }
 
 void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
-    //Overkill to do this on every event. Maybe move to timestep? IDK, but it works!
-    acc=Vector2();
-    if (g.wdown)
-        acc.y-=accMagnitude;
-    if (g.adown)
-        acc.x-=accMagnitude;
-    if (g.sdown)
-        acc.y+=accMagnitude;
-    if (g.ddown)
-        acc.x+=accMagnitude;
+    Character::handleEvent(e,gs);
 }
 
 void TestCharacter::render(const Camera& arg){

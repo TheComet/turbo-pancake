@@ -147,10 +147,10 @@ void GSArena::reset() {
     int d=rand()%sp2.size();
 
     Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
-    charman.addChar(TestCharacter(sp1[a].x,sp1[a].y,6,15,charactertexture,Sound()),true);
-    charman.addChar(TestCharacter(sp1[b].x,sp1[b].y,6,15,charactertexture,Sound()));
-    charman.addChar(TestCharacter(sp2[c].x,sp2[c].y,6,15,charactertexture,Sound()));
-    charman.addChar(TestCharacter(sp2[d].x,sp2[d].y,6,15,charactertexture,Sound()));
+    charman.addChar(TestCharacter(sp1[a].x,sp1[a].y,4,150,charactertexture,Sound()),true);
+    charman.addChar(TestCharacter(sp1[b].x,sp1[b].y,4,150,charactertexture,Sound()));
+    charman.addChar(TestCharacter(sp2[c].x,sp2[c].y,4,150,charactertexture,Sound()));
+    charman.addChar(TestCharacter(sp2[d].x,sp2[d].y,4,150,charactertexture,Sound()));
 }
 
 //Timestep. Calls timestep on the current active game state.
