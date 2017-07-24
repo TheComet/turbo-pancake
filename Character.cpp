@@ -1,5 +1,5 @@
 #include "Character.h"
-
+#include "GSArena.h"
 
 Character::Character() : deathSound() ,isdead(false),shoulddelete(false),playercontrolled(false) { }
 
@@ -36,6 +36,7 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
 
     //after final adjustments, move the character's coordinates
     pos+=vel*dt;
+    gs->map.circleMapCollide(pos,0.5);
 }
 
 void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
@@ -52,7 +53,7 @@ void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
 }
 
 void TestCharacter::render(const Camera& arg){
-    arg.renderTexture(t,pos.x,pos.y,0,1);
+    arg.renderTexture(t,pos.x-0.5,pos.y-0.5,0,1);
 }
 
 

@@ -2,6 +2,7 @@
 #include <vector>
 #include "Texture.h"
 #include "Camera.h"
+#include "CollisionUtil.h"
 enum Tiles {
     empty,
     wall,
@@ -27,6 +28,7 @@ class ArenaMap {
     std::vector<Texture> tiletextures;
     int ntiles;
     std::vector<std::vector<MapTile> > tiles;
+    std::vector<std::vector<std::vector<Rectangle> > > collisionGeometry;
 
     //clears and resizes the tiles/walls/walltextures vectors to nsize
     void resetMap();
@@ -42,6 +44,10 @@ class ArenaMap {
     Texture team1spawn;
     Texture team2spawn;
 public:
+
+    void circleMapCollide(Vector2 &c,double r);
+    //precondition: recalculateTextures has already been called.
+    void recalculateCollisionGeometry();
 
     ArenaMap();
 

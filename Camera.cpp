@@ -93,9 +93,9 @@ void Camera::renderTile(Texture &arg,double wx,double wy,double width) const {
 
     arg.renderScaled(pixelx,pixely,pixelrx-pixelx,pixeldy-pixely);
 }
-Vector2 Camera::worldToPixels(Vector2 w) {
+Vector2 Camera::worldToPixels(Vector2 w) const {
     return Vector2((w.x-pos.x)*multiplier+g.scWidth/2,(w.y-pos.y)*multiplier+g.scHeight/2);
 }
-Vector2 Camera::pixelsToWorld(Vector2 p) {
+Vector2 Camera::pixelsToWorld(Vector2 p) const {
     return Vector2((p.x-g.scWidth/2)/multiplier+pos.x,(p.y-g.scHeight/2)/multiplier+pos.y);
 }

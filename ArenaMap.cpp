@@ -2,7 +2,109 @@
 using namespace std;
 
 
-ArenaMap::ArenaMap() : tiletextures(),ntiles(0),tiles() { }
+void ArenaMap::circleMapCollide(Vector2 &circ,double r) {
+    int i=(int)circ.x;
+    int j=(int)circ.y;
+    for (int a=-1;a<2;a++) {
+        for (int b=-1;b<2;b++) {
+            if (isInBounds(i+a,j+b)) {
+                for (size_t c=0;c<collisionGeometry[i+a][j+b].size();c++) {
+                    circleRectangleCollide(circ,r,collisionGeometry[i+a][j+b][c]);
+                }
+            }
+        }
+    }
+}
+void ArenaMap::recalculateCollisionGeometry() {
+    collisionGeometry=
+        vector<vector<vector<Rectangle> > >(ntiles,
+            (vector<vector<Rectangle> >(ntiles,vector<Rectangle>())));
+    vector<vector<Rectangle> > collisionpresets(16); //length 16
+
+    /*0000wall: (14,13) to(35,35).
+    0001wall: (19,13) to(49,35)
+    0010wall: (14,0) to(37,31)
+    0011wall: (14,0) to(37,35). (37,13) to(49,35).
+    0100wall: (0,13) to(29,35)
+    0101wall: (0,13) to(49,35)
+    0110wall: (0,13) to(14,35). (14,0) to(37,35)
+    0111wall: (0,13) to(49,35). (14,0) to(37,13)
+    1000wall: (14,16) to(37,49)
+    1001wall: (14,13) to(37,49). (37,13) to(49,35)
+    1010wall: (14,0) to(37,49)
+    1011wall: (14,0) to(37,49). (37,13) to(49,35)
+    1100wall: (0,13) to(14,35). (14,13) to(37,49)
+    1101wall: (0,13) to(49,35). (14,35) to(37,49)
+    1110wall: (0,13) to(14,35). (14,0) to(37,49).
+    1111wall: (0,13) to(49,35). (14,0) to(37,49).
+
+    generated with Mathematica code! yey.
+    rectangles={{{14,13,35,35}},
+{{19,13,49,35}},
+{{14,0,37,31}},
+{{14,0,37,35},{37,13,49,35}},
+{{0,13,29,35}},
+{{0,13,49,35}},
+{{0,13,14,35},{14,0,37,35}},
+{{0,13,49,35},{14,0,37,13}},
+{{14,16,37,49}},
+{{14,13,37,49},{37,13,49,35}},
+{{14,0,37,49}},
+{{14,0,37,49},{37,13,49,35}},
+{{0,13,14,35},{14,13,37,49}},
+{{0,13,49,35},{14,35,37,49}},
+{{0,13,14,35},{14,0,37,49}},
+{{0,13,49,35},{14,0,37,49}}};
+f1[points_]:="Rectangle("<>StringReplace[ToString[N[(points+{0,0,1,1})/50.0]],{"{"->"","}"->""}]<>")";
+f2[points_,index_]:="collisionpresets["<>ToString[index-1]<>"].push_back("<>f1[points]<>");\n";
+f3[pointss_,index_]:=StringJoin[Function[s,f2[s,First[index]]]/@pointss];
+StringJoin[MapIndexed[f3,rectangles]]
+    */
+    vector<vector<Rectangle> > cpresets(16); //length 16
+    collisionpresets[0].push_back(Rectangle(0.28,0.26,0.72,0.72));
+    collisionpresets[1].push_back(Rectangle(0.38,0.26,1.,0.72));
+    collisionpresets[2].push_back(Rectangle(0.28,0.,0.76,0.64));
+    collisionpresets[3].push_back(Rectangle(0.28,0.,0.76,0.72));
+    collisionpresets[3].push_back(Rectangle(0.74,0.26,1.,0.72));
+    collisionpresets[4].push_back(Rectangle(0.,0.26,0.6,0.72));
+    collisionpresets[5].push_back(Rectangle(0.,0.26,1.,0.72));
+    collisionpresets[6].push_back(Rectangle(0.,0.26,0.3,0.72));
+    collisionpresets[6].push_back(Rectangle(0.28,0.,0.76,0.72));
+    collisionpresets[7].push_back(Rectangle(0.,0.26,1.,0.72));
+    collisionpresets[7].push_back(Rectangle(0.28,0.,0.76,0.28));
+    collisionpresets[8].push_back(Rectangle(0.28,0.32,0.76,1.));
+    collisionpresets[9].push_back(Rectangle(0.28,0.26,0.76,1.));
+    collisionpresets[9].push_back(Rectangle(0.74,0.26,1.,0.72));
+    collisionpresets[10].push_back(Rectangle(0.28,0.,0.76,1.));
+    collisionpresets[11].push_back(Rectangle(0.28,0.,0.76,1.));
+    collisionpresets[11].push_back(Rectangle(0.74,0.26,1.,0.72));
+    collisionpresets[12].push_back(Rectangle(0.,0.26,0.3,0.72));
+    collisionpresets[12].push_back(Rectangle(0.28,0.26,0.76,1.));
+    collisionpresets[13].push_back(Rectangle(0.,0.26,1.,0.72));
+    collisionpresets[13].push_back(Rectangle(0.28,0.7,0.76,1.));
+    collisionpresets[14].push_back(Rectangle(0.,0.26,0.3,0.72));
+    collisionpresets[14].push_back(Rectangle(0.28,0.,0.76,1.));
+    collisionpresets[15].push_back(Rectangle(0.,0.26,1.,0.72));
+    collisionpresets[15].push_back(Rectangle(0.28,0.,0.76,1.));
+
+    for (int i=0;i<ntiles;i++) {
+        for (int j=0;j<ntiles;j++) {
+            //tiles 1 through 16 have collision geometries as per the list above.
+            if (tiles[i][j].walltexture>0) {
+                std::vector<Rectangle> colliders=collisionpresets[tiles[i][j].walltexture-1];
+                for (size_t k=0;k<colliders.size();k++) {
+                    collisionGeometry[i][j].push_back(colliders[k]);
+                    collisionGeometry[i][j][collisionGeometry[i][j].size()-1].x0+=i;
+                    collisionGeometry[i][j][collisionGeometry[i][j].size()-1].x1+=i;
+                    collisionGeometry[i][j][collisionGeometry[i][j].size()-1].y0+=j;
+                    collisionGeometry[i][j][collisionGeometry[i][j].size()-1].y1+=j;
+                }
+            }
+        }
+    }
+}
+
+ArenaMap::ArenaMap() : tiletextures(),collisionGeometry(),ntiles(0),tiles() { }
 void ArenaMap::initialize() {
     tiletextures.push_back(loadTexture("media/tile.png"));
     tiletextures.push_back(loadTexture("media/0000wall.png"));
@@ -24,7 +126,9 @@ void ArenaMap::initialize() {
     createCircleMap(13);
     team1spawn=loadTexture("media/team1spawn.png");
     team2spawn=loadTexture("media/team2spawn.png");
+    recalculateCollisionGeometry();
 }
+
 void ArenaMap::resetMap() {
     tiles=vector<vector<MapTile> >(ntiles,(vector<MapTile>(ntiles,MapTile())));
 }

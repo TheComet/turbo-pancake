@@ -20,8 +20,8 @@ class Camera {
 public:
     Camera();
 
-    Vector2 worldToPixels(Vector2 w);
-    Vector2 pixelsToWorld(Vector2 p);
+    Vector2 worldToPixels(Vector2 w) const;
+    Vector2 pixelsToWorld(Vector2 p) const ;
 
 
     //Ensures that the point at (x,y) is at the center of the screen.
