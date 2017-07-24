@@ -21,7 +21,6 @@ protected:
     bool playerIsMovingRight;
     bool playerIsMovingLeft;
 public:
-    Sound deathSound;
 
     Character();
 
@@ -39,7 +38,7 @@ public:
     virtual void moveUp()=0; //move in the NEGATIVE y direction (screen space up!)
     virtual void moveDown()=0; //move in the positive y direction
     virtual void moveDir(double x, double y)=0; //move in a certain direction (magnitude is ignored)
-    virtual void lookAt(double x,double y)=0; //look at the world coordinate x,y.
+    virtual void lookAt(double x,double y,bool showIcon=true)=0; //look at the world coordinate x,y.
 
     //getters and setters for determining if a character is dead/ready to be deleted/player controlled.
     //an "isDead" character is not controllable, but may be playing some animation or doing some important work,
@@ -59,6 +58,7 @@ public:
 };
 
 class TestCharacter : public Character {
+    Sound deathSound;
     Vector2 acc;
     double accMagnitude;
     Vector2 vel;
@@ -69,6 +69,18 @@ class TestCharacter : public Character {
     bool controlled;
 
     TestCharacter* unsafe_copy() const override;
+
+    //Angle in radians
+    double angle;
+    //Angle to look towards
+    double targetAngle;
+    //Angle to look towards
+    double lookSpeed;
+    //time since the character looked somewhere else.
+    Uint32 lastLookAt;
+    //Icon to display when the character looks somewhere else.
+    Texture directionIcon;
+
 
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
@@ -83,7 +95,7 @@ public:
     void moveUp(); //move in the NEGATIVE y direction (screen space up!)
     void moveDown(); //move in the positive y direction
     void moveDir(double x,double y); //move in a certain direction (magnitude is ignored)
-    void lookAt(double x,double y); //look at the world coordinate x,y.
+    void lookAt(double x,double y,bool showIcon=true); //look at the world coordinate x,y.
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;

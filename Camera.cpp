@@ -82,7 +82,7 @@ void Camera::timestep(double dt) {
 
 //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
 void Camera::renderTexture(Texture &arg,double wx,double wy,double angle,double width) const {
-    arg.renderScaled((int)((wx-pos.x)*width*multiplier+g.scWidth/2),(int)((wy-pos.y)*width*multiplier+g.scHeight/2),(int)(width*multiplier),(int)(width*multiplier),nullptr,angle);
+    arg.renderScaled((int)((wx-pos.x)*multiplier+g.scWidth/2-width/2.0*multiplier),(int)((wy-pos.y)*multiplier+g.scHeight/2-width/2.0*multiplier),(int)(width*multiplier),(int)(width*multiplier),nullptr,angle);
 }
 //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
 void Camera::renderTile(Texture &arg,double wx,double wy,double width) const {

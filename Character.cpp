@@ -1,7 +1,7 @@
 #include "Character.h"
 #include "GSArena.h"
 
-Character::Character() : deathSound() ,isdead(false),shoulddelete(false),
+Character::Character() : isdead(false),shoulddelete(false),
 playercontrolled(false),
 playerIsMovingUp(false),
 playerIsMovingDown(false),
@@ -26,7 +26,10 @@ void Character::timestep(double dt,GSArena *gs) {
             moveRight();
         if (playerIsMovingLeft)
             moveLeft();
+        Vector2 fpos=gs->cam.pixelsToWorld(Vector2(g.mousex,g.mousey));
+        lookAt(fpos.x,fpos.y,false);
     }
+    
 }
 void Character::handleEvent(SDL_Event *e,GSArena *gs) {
     if (e->type==SDL_KEYDOWN || e->type==SDL_KEYUP) {
@@ -34,6 +37,10 @@ void Character::handleEvent(SDL_Event *e,GSArena *gs) {
         playerIsMovingRight=g.ddown;
         playerIsMovingUp=g.wdown;
         playerIsMovingDown=g.sdown;
+    }
+    else if (e->type==SDL_MOUSEMOTION) {
+        Vector2 fpos=gs->cam.pixelsToWorld(Vector2(g.mousex,g.mousey));
+        lookAt(fpos.x,fpos.y);
     }
 }
 
@@ -62,16 +69,18 @@ void TestCharacter::moveDir(double x,double y) {
     if (acc.length()>0)
         acc=accMagnitude*acc.normalized();
 }
-void TestCharacter::lookAt(double x,double y) {
-
+void TestCharacter::lookAt(double x,double y,bool showIcon) {
+    targetAngle=atan2(y-pos.y,x-pos.x);
+    if(showIcon)
+        lastLookAt=SDL_GetTicks();
 }
 
 TestCharacter* TestCharacter::unsafe_copy() const{
     return new TestCharacter(*this);
 }
 
-TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(), acc(),accMagnitude(acceleration),vel(),pos(x,y),speedcap(velcap),t(img),controlled(false)  {
-	deathSound = death;
+TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(), deathSound(death), acc(),accMagnitude(acceleration),vel(),pos(x,y),speedcap(velcap),t(img),controlled(false),
+  angle(0),targetAngle(0),lookSpeed(20),lastLookAt(0),directionIcon(loadTexture("media/character-pointing.png")) {
 }
 
 void TestCharacter::timestep(double dt, GSArena *gs) {
@@ -96,6 +105,29 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
     pos+=vel*dt;
     gs->map.circleMapCollide(pos,0.47);
     acc=Vector2(); //the character does not keep accelerating unless moveLeft is constantly called.
+
+
+    //Super brute force "look at" method.
+    //Calculates the distance between (cos(angle),sin(angle)) and (cos(targetAngle),sin(targetAngle)). 
+    //if increasing angle decreases this distance, increase angle. Else decrease angle. And if 
+    //they're close enough, just set angle=targetAngle.
+    const double pi=3.14159265359;
+    const double pi2=2*3.14159265359;
+    double c=cos(angle);
+    double s=sin(angle);
+    double ctarget=cos(targetAngle);
+    double starget=sin(targetAngle);
+    double c2=cos(angle+dt*lookSpeed);
+    double s2=sin(angle+dt*lookSpeed);
+    double d1=(c-ctarget)*(c-ctarget)+(s-starget)*(s-starget);
+    double d2=(c2-ctarget)*(c2-ctarget)+(s2-starget)*(s2-starget);
+    if (d1<0.1)
+        angle=targetAngle;
+    else if (d2<d1)
+        angle+=dt*lookSpeed;
+    else
+        angle-=dt*lookSpeed;
+    angle=fmod(angle,pi2);
 }
 
 void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
@@ -103,7 +135,21 @@ void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
 }
 
 void TestCharacter::render(const Camera& arg){
-    arg.renderTexture(t,pos.x-0.5,pos.y-0.5,0,1);
+    arg.renderTexture(t,pos.x,pos.y,0,1);
+
+    double timeSinceLook=(SDL_GetTicks()-lastLookAt)*0.001;
+    double opacity=0.3;
+    double startfade=0.2;
+    double fadelength=0.4;
+    if (timeSinceLook>startfade+fadelength) {
+        opacity=0;
+    }
+    else if (timeSinceLook>startfade) {
+        opacity=(1-(timeSinceLook-startfade)/fadelength)*0.3;
+    }
+    directionIcon.setAlpha((Uint8)(255*opacity));
+    double iconRadius=0.6;
+    arg.renderTexture(directionIcon,pos.x,pos.y,180.0*angle/3.1415926,2);
 }
 
 
