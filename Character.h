@@ -3,6 +3,28 @@
 #include "Vector2.h"
 #include <vector>
 
+class VectorEaser {
+
+public:
+    Vector2 point;
+    Vector2 target;
+    double rate;
+    VectorEaser() : point(),target(),rate(0) { }
+    VectorEaser(Vector2 upoint,Vector2 utarget,double urate) : point(upoint),target(utarget),rate(urate) { }
+    Vector2 easeexp(double dt) {
+        point=(point-target)*exp(-rate*dt)+target;
+        return point;
+    }
+    Vector2 easelinear(double dt) {
+        double d=(point-target).length();
+        if (d<rate*dt)
+            point=target;
+        else
+            point=point+(target-point)*rate*dt/d;
+        return point;
+    }
+};
+
 class GSArena;
 
 class Character {
@@ -39,6 +61,9 @@ public:
     virtual void moveDown()=0; //move in the positive y direction
     virtual void moveDir(double x, double y)=0; //move in a certain direction (magnitude is ignored)
     virtual void lookAt(double x,double y,bool showIcon=true)=0; //look at the world coordinate x,y.
+    virtual void attack()=0; 
+    virtual void block()=0;
+    virtual void idle()=0;
 
     //getters and setters for determining if a character is dead/ready to be deleted/player controlled.
     //an "isDead" character is not controllable, but may be playing some animation or doing some important work,
@@ -84,14 +109,17 @@ class TestCharacter : public Character {
     Texture sword;
     Texture shield;
     enum AttackMode {
-        idle,
-        attacking,
-        blocking
+        idlestate,
+        attackstate,
+        blockstate
     };
 
     AttackMode attackmode;
     Uint32 attackStarted;
     double attackDuration;
+
+    VectorEaser shieldpos;
+    VectorEaser swordpos;
     
 
 
@@ -100,7 +128,7 @@ public:
 	~TestCharacter() {}
 
     void timestep(double dt, GSArena *gs) override;
-	void handleEvent(SDL_Event *e, GSArena *gs) override;
+	//void handleEvent(SDL_Event *e, GSArena *gs) override;
 	void render(const Camera& arg) override;
 
     void moveRight(); //move in the positive x direction
@@ -109,6 +137,9 @@ public:
     void moveDown(); //move in the positive y direction
     void moveDir(double x,double y); //move in a certain direction (magnitude is ignored)
     void lookAt(double x,double y,bool showIcon=true); //look at the world coordinate x,y.
+    void attack();
+    void block();
+    void idle();
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;

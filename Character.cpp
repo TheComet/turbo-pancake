@@ -1,6 +1,41 @@
 #include "Character.h"
 #include "GSArena.h"
 
+
+/*
+class AngleEaser {
+    double target;
+    Vector2 point;
+    Vector2 easeexp(double dt) {
+        point=(point-target)*exp(-rate*dt)+target;
+        return point;
+    }
+    Vector2 easelinear(double dt) {
+        double c=cos(angle);
+        double s=sin(angle);
+        double ctarget=cos(targetAngle);
+        double starget=sin(targetAngle);
+        double c2=cos(angle+dt*lookSpeed);
+        double s2=sin(angle+dt*lookSpeed);
+        double d1=(c-ctarget)*(c-ctarget)+(s-starget)*(s-starget);
+        double d2=(c2-ctarget)*(c2-ctarget)+(s2-starget)*(s2-starget);
+        if (d1<0.1)
+            angle=targetAngle;
+        else if (d2<d1)
+            angle+=dt*lookSpeed;
+        else
+            angle-=dt*lookSpeed;
+        double d=(point-target).length();
+        if (d<rate*dt)
+            point=target;
+        else
+            point=point+(target-point)*rate*dt/d;
+        return point;
+    }
+};*/
+
+
+
 Character::Character() : isdead(false),shoulddelete(false),
 playercontrolled(false),
 playerIsMovingUp(false),
@@ -29,7 +64,6 @@ void Character::timestep(double dt,GSArena *gs) {
         Vector2 fpos=gs->cam.pixelsToWorld(Vector2(g.mousex,g.mousey));
         lookAt(fpos.x,fpos.y,false);
     }
-    
 }
 void Character::handleEvent(SDL_Event *e,GSArena *gs) {
     if (e->type==SDL_KEYDOWN || e->type==SDL_KEYUP) {
@@ -41,6 +75,20 @@ void Character::handleEvent(SDL_Event *e,GSArena *gs) {
     else if (e->type==SDL_MOUSEMOTION) {
         Vector2 fpos=gs->cam.pixelsToWorld(Vector2(g.mousex,g.mousey));
         lookAt(fpos.x,fpos.y);
+    }
+    if (!g.mouseCapturedByGUI) {
+        if (e->type==SDL_MOUSEBUTTONDOWN && e->button.button==SDL_BUTTON_LEFT) {
+            attack();
+        }
+        else if (e->type==SDL_MOUSEBUTTONDOWN && e->button.button==SDL_BUTTON_RIGHT) {
+            block();
+        }
+        else if (e->type==SDL_MOUSEBUTTONUP && e->button.button==SDL_BUTTON_LEFT) {
+
+        }
+        else if (e->type==SDL_MOUSEBUTTONUP && e->button.button==SDL_BUTTON_RIGHT) {
+            idle();
+        }
     }
 }
 
@@ -80,8 +128,8 @@ TestCharacter* TestCharacter::unsafe_copy() const{
 }
 
 TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(), deathSound(death), acc(),accMagnitude(acceleration),vel(),pos(x,y),speedcap(velcap),t(img),controlled(false),
-  angle(0),targetAngle(0),lookSpeed(20),lastLookAt(0),directionIcon() ,sword(),shield(),attackmode(AttackMode::idle),
-  attackStarted(0),attackDuration(1) {
+  angle(0),targetAngle(0),lookSpeed(20),lastLookAt(0),directionIcon() ,sword(),shield(),attackmode(AttackMode::idlestate),
+  attackStarted(0),attackDuration(0.15),shieldpos(Vector2(x,y),Vector2(x,y),40), swordpos(Vector2(x,y),Vector2(x,y),40) {
     directionIcon=loadTexture("media/character-pointing.png");
     sword=loadTexture("media/basic_sword.png");
     shield=loadTexture("media/basic_shield.png");
@@ -131,16 +179,33 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
         angle-=dt*lookSpeed;
     angle=fmod(angle,2*M_PI);
 
-    if (attackmode==AttackMode::attacking) {
+    if (attackmode==AttackMode::attackstate) {
         if (SDL_GetTicks()-attackStarted>(Uint32)(attackDuration*1000)) {
-            attackmode=AttackMode::idle;
+            attackmode=AttackMode::idlestate;
         }
     }
+
+    swordpos.easeexp(dt);
+    shieldpos.easeexp(dt);
+}
+void TestCharacter::attack() {
+    if (attackmode==AttackMode::idlestate) {
+        attackmode=AttackMode::attackstate;
+        attackStarted=SDL_GetTicks();
+    }
+
+}
+void TestCharacter::block() {
+    if (attackmode==AttackMode::idlestate)
+        attackmode=AttackMode::blockstate;
+
+}
+void TestCharacter::idle() {
+    if (attackmode==AttackMode::blockstate)
+        attackmode=AttackMode::idlestate;
+
 }
 
-void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
-    Character::handleEvent(e,gs);
-}
 
 void TestCharacter::render(const Camera& arg){
     arg.renderTexture(t,pos.x,pos.y,0,1);
@@ -159,27 +224,58 @@ void TestCharacter::render(const Camera& arg){
     double iconRadius=0.6;
     arg.renderTexture(directionIcon,pos.x,pos.y,180.0*angle/M_PI,2);
 
-    if (attackmode==AttackMode::attacking) {
+    if (attackmode==AttackMode::attackstate) {
+        double shieldoffset=60.0*M_PI/180.0;
+        double shieldradius=0.55;
+        double c1=cos(angle+shieldoffset);
+        double s1=sin(angle+shieldoffset);
+        //arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
+        arg.renderTexture(shield,shieldpos.point.x,shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
+        shieldpos.target=pos+Vector2(c1,s1)*shieldradius;
+
+        double Deltat=(SDL_GetTicks()-attackStarted)*0.001;
+        double swordoffset=60.0*M_PI/180.0 - Deltat/attackDuration*120*M_PI/180.0;
+        double swordradius=1;
+        double c2=cos(angle-swordoffset);
+        double s2=sin(angle-swordoffset);
+        //arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
+        arg.renderTexture(sword,swordpos.point.x,swordpos.point.y,90+180.0*(angle-swordoffset)/M_PI,1);
+        swordpos.target=pos+Vector2(c2,s2)*swordradius;
+    }
+    else if (attackmode==AttackMode::blockstate) {
+        double shieldoffset=0;
+        double shieldradius=0.6;
+        double c1=cos(angle+shieldoffset);
+        double s1=sin(angle+shieldoffset);
+        //arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
+        arg.renderTexture(shield,shieldpos.point.x,shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
+        shieldpos.target=pos+Vector2(c1,s1)*shieldradius;
+
+        double swordoffset=110.0*M_PI/180.0;
+        double swordradius=0.45;
+        double c2=cos(angle-swordoffset);
+        double s2=sin(angle-swordoffset);
+        //arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
+        arg.renderTexture(sword,swordpos.point.x,swordpos.point.y,30+90+180.0*(angle)/M_PI-180,1);
+        swordpos.target=pos+Vector2(c2,s2)*swordradius;
 
     }
-    else if (attackmode==AttackMode::blocking) {
-
-    }
-    else if (attackmode==AttackMode::idle) {
+    else if (attackmode==AttackMode::idlestate) {
         double shieldoffset=60.0*M_PI/180.0;
         double shieldradius=0.6;
         double c1=cos(angle+shieldoffset);
         double s1=sin(angle+shieldoffset);
-
-        arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
+        //arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
+        arg.renderTexture(shield,shieldpos.point.x,shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
+        shieldpos.target=pos+Vector2(c1,s1)*shieldradius;
 
         double swordoffset=60.0*M_PI/180.0;
         double swordradius=0.6;
         double c2=cos(angle-swordoffset);
         double s2=sin(angle-swordoffset);
-        arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
-
-
+        //arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
+        arg.renderTexture(sword,swordpos.point.x,swordpos.point.y,30+90+180.0*(angle)/M_PI,1);
+        swordpos.target=pos+Vector2(c2,s2)*swordradius;
     }
 }
 

@@ -184,12 +184,11 @@ void GSArena::handleEvent(SDL_Event *e) {
 		}
 	}
 
-    if (!g.mouseCapturedByGUI) {
-        g.mouseCapturedByGUI=g.mouseCapturedByGUI||back.handleEvent(e);
-        g.mouseCapturedByGUI=g.mouseCapturedByGUI||resetButton.handleEvent(e);
-        if(!g.mouseCapturedByGUI)
-            g.mouseCapturedByGUI=g.mouseCapturedByGUI||cam.handleEvent(e);
-    }
+    g.mouseCapturedByGUI=g.mouseCapturedByGUI||back.handleEvent(e);
+    g.mouseCapturedByGUI=g.mouseCapturedByGUI||resetButton.handleEvent(e);
+    if (!g.mouseCapturedByGUI) 
+        cam.handleEvent(e);
+    
 	
     charman.handleEvent(e, this);
 }
