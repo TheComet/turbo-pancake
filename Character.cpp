@@ -80,7 +80,11 @@ TestCharacter* TestCharacter::unsafe_copy() const{
 }
 
 TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(), deathSound(death), acc(),accMagnitude(acceleration),vel(),pos(x,y),speedcap(velcap),t(img),controlled(false),
-  angle(0),targetAngle(0),lookSpeed(20),lastLookAt(0),directionIcon(loadTexture("media/character-pointing.png")) {
+  angle(0),targetAngle(0),lookSpeed(20),lastLookAt(0),directionIcon() ,sword(),shield(),attackmode(AttackMode::idle),
+  attackStarted(0),attackDuration(1) {
+    directionIcon=loadTexture("media/character-pointing.png");
+    sword=loadTexture("media/basic_sword.png");
+    shield=loadTexture("media/basic_shield.png");
 }
 
 void TestCharacter::timestep(double dt, GSArena *gs) {
@@ -111,8 +115,6 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
     //Calculates the distance between (cos(angle),sin(angle)) and (cos(targetAngle),sin(targetAngle)). 
     //if increasing angle decreases this distance, increase angle. Else decrease angle. And if 
     //they're close enough, just set angle=targetAngle.
-    const double pi=3.14159265359;
-    const double pi2=2*3.14159265359;
     double c=cos(angle);
     double s=sin(angle);
     double ctarget=cos(targetAngle);
@@ -127,7 +129,13 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
         angle+=dt*lookSpeed;
     else
         angle-=dt*lookSpeed;
-    angle=fmod(angle,pi2);
+    angle=fmod(angle,2*M_PI);
+
+    if (attackmode==AttackMode::attacking) {
+        if (SDL_GetTicks()-attackStarted>(Uint32)(attackDuration*1000)) {
+            attackmode=AttackMode::idle;
+        }
+    }
 }
 
 void TestCharacter::handleEvent(SDL_Event *e, GSArena *gs) {
@@ -149,7 +157,30 @@ void TestCharacter::render(const Camera& arg){
     }
     directionIcon.setAlpha((Uint8)(255*opacity));
     double iconRadius=0.6;
-    arg.renderTexture(directionIcon,pos.x,pos.y,180.0*angle/3.1415926,2);
+    arg.renderTexture(directionIcon,pos.x,pos.y,180.0*angle/M_PI,2);
+
+    if (attackmode==AttackMode::attacking) {
+
+    }
+    else if (attackmode==AttackMode::blocking) {
+
+    }
+    else if (attackmode==AttackMode::idle) {
+        double shieldoffset=60.0*M_PI/180.0;
+        double shieldradius=0.6;
+        double c1=cos(angle+shieldoffset);
+        double s1=sin(angle+shieldoffset);
+
+        arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
+
+        double swordoffset=60.0*M_PI/180.0;
+        double swordradius=0.6;
+        double c2=cos(angle-swordoffset);
+        double s2=sin(angle-swordoffset);
+        arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
+
+
+    }
 }
 
 

@@ -81,6 +81,19 @@ class TestCharacter : public Character {
     //Icon to display when the character looks somewhere else.
     Texture directionIcon;
 
+    Texture sword;
+    Texture shield;
+    enum AttackMode {
+        idle,
+        attacking,
+        blocking
+    };
+
+    AttackMode attackmode;
+    Uint32 attackStarted;
+    double attackDuration;
+    
+
 
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
