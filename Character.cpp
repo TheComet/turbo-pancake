@@ -230,8 +230,8 @@ void TestCharacter::render(const Camera& arg){
         double c1=cos(angle+shieldoffset);
         double s1=sin(angle+shieldoffset);
         //arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
-        arg.renderTexture(shield,shieldpos.point.x,shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
-        shieldpos.target=pos+Vector2(c1,s1)*shieldradius;
+        arg.renderTexture(shield,pos.x+shieldpos.point.x,pos.y+shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
+        shieldpos.target=Vector2(c1,s1)*shieldradius;
 
         double Deltat=(SDL_GetTicks()-attackStarted)*0.001;
         double swordoffset=60.0*M_PI/180.0 - Deltat/attackDuration*120*M_PI/180.0;
@@ -239,8 +239,8 @@ void TestCharacter::render(const Camera& arg){
         double c2=cos(angle-swordoffset);
         double s2=sin(angle-swordoffset);
         //arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
-        arg.renderTexture(sword,swordpos.point.x,swordpos.point.y,90+180.0*(angle-swordoffset)/M_PI,1);
-        swordpos.target=pos+Vector2(c2,s2)*swordradius;
+        arg.renderTexture(sword,pos.x+swordpos.point.x,pos.y+swordpos.point.y,90+180.0*(angle-swordoffset)/M_PI,1);
+        swordpos.target=Vector2(c2,s2)*swordradius;
     }
     else if (attackmode==AttackMode::blockstate) {
         double shieldoffset=0;
@@ -248,16 +248,16 @@ void TestCharacter::render(const Camera& arg){
         double c1=cos(angle+shieldoffset);
         double s1=sin(angle+shieldoffset);
         //arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
-        arg.renderTexture(shield,shieldpos.point.x,shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
-        shieldpos.target=pos+Vector2(c1,s1)*shieldradius;
+        arg.renderTexture(shield,pos.x+shieldpos.point.x,pos.y+shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
+        shieldpos.target=Vector2(c1,s1)*shieldradius;
 
         double swordoffset=110.0*M_PI/180.0;
         double swordradius=0.45;
         double c2=cos(angle-swordoffset);
         double s2=sin(angle-swordoffset);
         //arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
-        arg.renderTexture(sword,swordpos.point.x,swordpos.point.y,30+90+180.0*(angle)/M_PI-180,1);
-        swordpos.target=pos+Vector2(c2,s2)*swordradius;
+        arg.renderTexture(sword,pos.x+swordpos.point.x,pos.y+swordpos.point.y,30+90+180.0*(angle)/M_PI-180,1);
+        swordpos.target=Vector2(c2,s2)*swordradius;
 
     }
     else if (attackmode==AttackMode::idlestate) {
@@ -266,16 +266,16 @@ void TestCharacter::render(const Camera& arg){
         double c1=cos(angle+shieldoffset);
         double s1=sin(angle+shieldoffset);
         //arg.renderTexture(shield,pos.x+c1*shieldradius,pos.y+s1*shieldradius,180.0*(angle+shieldoffset)/M_PI,0.6);
-        arg.renderTexture(shield,shieldpos.point.x,shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
-        shieldpos.target=pos+Vector2(c1,s1)*shieldradius;
+        arg.renderTexture(shield,pos.x+shieldpos.point.x,pos.y+shieldpos.point.y,180.0*(angle+shieldoffset)/M_PI,0.6);
+        shieldpos.target=Vector2(c1,s1)*shieldradius;
 
         double swordoffset=60.0*M_PI/180.0;
         double swordradius=0.6;
         double c2=cos(angle-swordoffset);
         double s2=sin(angle-swordoffset);
         //arg.renderTexture(sword,pos.x+c2*swordradius,pos.y+s2*swordradius,30+90+180.0*(angle)/M_PI,1);
-        arg.renderTexture(sword,swordpos.point.x,swordpos.point.y,30+90+180.0*(angle)/M_PI,1);
-        swordpos.target=pos+Vector2(c2,s2)*swordradius;
+        arg.renderTexture(sword,pos.x+swordpos.point.x,pos.y+swordpos.point.y,30+90+180.0*(angle)/M_PI,1);
+        swordpos.target=Vector2(c2,s2)*swordradius;
     }
 }
 

@@ -5,6 +5,55 @@ class Camera {
     Vector2 pos;
     double multiplier;
 
+public:
+    Camera();
+
+    //the linear transformation which sends the camera's position (pos) to (g.scWidth/2,g.scHeight/2),
+    //while multiplying scale by multiplier.
+    Vector2 worldToPixels(Vector2 w) const;
+
+    //the inverse transformation of worldToPixels.
+    Vector2 pixelsToWorld(Vector2 p) const ;
+
+    //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
+    void renderTexture(Texture &arg,double wx,double wy,double angle,double width) const;
+
+    //Rendering a tile ensures that the square image is drawn from the floor of the leftmost pixel 
+    //to the ceil of the rightmost pixel, so that you don't get off-by-one visual errors like 
+    //pixel-wide gaps between adjacent tiles.
+    void renderTile(Texture &arg,double wx,double wy,double width) const;
+
+    //getters and setters
+    Vector2  getPos();
+    void setPos(Vector2 arg);
+    double getMultiplier();
+    void setMultiplier(double arg);
+};
+
+class CameraController {
+protected:
+    Camera *camP;
+public:
+    CameraController();
+
+    //returns cameraPointer!=nullptr
+    virtual bool cameraValid();
+
+    //sets the internal camera pointer to the argument
+    virtual void attachCamera(Camera *cameraPointer);
+
+    //sets cameraPointer to null.
+    virtual void detachCamera();
+
+    //Handle dragging mouse input. Returns true if the event was captured (any mouse click or click-drag movement).
+    virtual bool handleEvent(SDL_Event *e)=0;
+
+    //Update internal state (could be velocity, friction, etc.). Default implementation does nothing.
+    virtual void timestep(double dt);
+};
+
+class DraggingCameraController : public CameraController {
+
     bool cameradraggable; //if false, handleEvent does nothing.
 
     Vector2 v; //camera velocity for click and drag releases
@@ -17,30 +66,28 @@ class Camera {
     bool dragging; //true if the mouse has been clicked and held.
     int dragbutton; //-1 if any mouse click, 0 if left click, 1 if right click, 2 if middle click.
     double lastdt;
+
 public:
-    Camera();
+    DraggingCameraController();
 
-    Vector2 worldToPixels(Vector2 w) const;
-    Vector2 pixelsToWorld(Vector2 p) const ;
+    //sets draggable=arg.
+    void setDraggable(bool arg=true); 
 
+    //resets v, mousedragpos,mousedragpospixels,dragging, and lastdt.
+    void resetState();
 
-    //Ensures that the point at (x,y) is at the center of the screen.
-    //Note that the center of the tile at (0,0) has coordinates (0.5,0.5).
-    void centerCameraOnTile(double x,double y);
+    //sets cameraPointer to null. Also zeroes internal state like camera velocity.
+    void detachCamera() override;
 
-    void setDraggable(bool arg=true); //draggable=true
-    void setDragButton(int arg=-1); //-1 if any mouse click, 0 if left click, 1 if right click, 2 if middle click.
-    bool getCameraDraggable(); //return draggable
+    //-1 if any mouse click, 0 if left click, 1 if right click, 2 if middle click.
+    void setDragButton(int arg=-1); 
 
-    //Core things: events & movement!
-    bool handleEvent(SDL_Event *e);
-    void timestep(double dt);
+    //return draggable
+    bool getCameraDraggable(); 
 
-    //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
-    void renderTexture(Texture &arg,double wx,double wy,double angle,double width) const;
+    //Handle dragging mouse input. Returns true if the event was captured (any mouse click or click-drag movement).
+    bool handleEvent(SDL_Event *e) override;
 
-    //Rendering a tile ensures that the square image is drawn from the floor of the leftmost pixel 
-    //to the ceil of the rightmost pixel, so that you don't get off-by-one visual errors like 
-    //pixel-wide gaps between adjacent tiles.
-    void renderTile(Texture &arg,double wx,double wy,double width) const;
+    //Update internal state (velocity, friction, etc.)
+    void timestep(double dt) override;
 };

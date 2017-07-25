@@ -3,9 +3,14 @@
 
 
 using namespace std;
-GSMapEditor::GSMapEditor() : back(), toggleBackground(),togglers(), editorx(0),editory(0), editorpaint(0), stateChange(0),leftclickheld(false),rightclickheld(false),xtilelast(0),ytilelast(0) { }
+GSMapEditor::GSMapEditor() : back(), toggleBackground(),togglers(), editorx(0),editory(0), editorpaint(0), stateChange(0),leftclickheld(false),rightclickheld(false),xtilelast(0),ytilelast(0),camController() { }
 
 void GSMapEditor::initialize() {
+
+    camController.attachCamera(&cam);
+    camController.setDraggable();
+    camController.setDragButton(2);
+
     //Initialize and position the main screen buttons
     Texture p=loadTexture("media/backbutton_pressed.png");
     Texture up=loadTexture("media/backbutton.png");
@@ -43,8 +48,6 @@ void GSMapEditor::initialize() {
 
     stateChange=0;
     map.initialize();
-    cam.setDraggable();
-    cam.setDragButton(2);
 }
 
 
@@ -80,7 +83,7 @@ void GSMapEditor::timestep(double dt) {
         back.pressReceived();
     }
     updateEditorPaint();
-    cam.timestep(dt);
+    camController.timestep(dt);
     if (leftclickheld) {
         Vector2 w=cam.pixelsToWorld(Vector2(g.mousex,g.mousey));
         int xtilenew=(int)w.x;
@@ -127,7 +130,7 @@ void GSMapEditor::render() {
 
 }
 void GSMapEditor::handleEvent(SDL_Event *e) {
-    g.mouseCapturedByGUI=(g.mouseCapturedByGUI||back.handleEvent(e)||cam.handleEvent(e));
+    g.mouseCapturedByGUI=(g.mouseCapturedByGUI||back.handleEvent(e)||camController.handleEvent(e));
 
     for (size_t i=0;i<togglers.size();i++)
         g.mouseCapturedByGUI=g.mouseCapturedByGUI||togglers[i].handleEvent(e);

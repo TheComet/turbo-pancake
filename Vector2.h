@@ -54,6 +54,33 @@ inline Vector2 lerp(double t,const Vector2& vec1,const Vector2& vec2);
 //cubic interpolation between v1 and v2 with control points v0 v3.
 inline Vector2 cerp(double t,const Vector2& vec0,const Vector2& vec1,const Vector2& vec2,const Vector2& vec3);
 
+
+class VectorEaser {
+
+public:
+    Vector2 point;
+    Vector2 target;
+    double rate;
+    VectorEaser() : point(),target(),rate(0) { }
+    VectorEaser(Vector2 upoint,Vector2 utarget,double urate) : point(upoint),target(utarget),rate(urate) { }
+    Vector2 easeexp(double dt) {
+        point=(point-target)*exp(-rate*dt)+target;
+        return point;
+    }
+    Vector2 easelinear(double dt) {
+        double d=(point-target).length();
+        if (d<rate*dt)
+            point=target;
+        else
+            point=point+(target-point)*rate*dt/d;
+        return point;
+    }
+};
+
+
+
+
+
 inline Vector2::Vector2() : x(0),y(0) { }
 inline Vector2::Vector2(double a,double b) : x(a),y(b) { }
 inline Vector2 Vector2::operator+ (const Vector2& b) const {

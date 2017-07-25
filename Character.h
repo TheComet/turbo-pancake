@@ -3,27 +3,7 @@
 #include "Vector2.h"
 #include <vector>
 
-class VectorEaser {
 
-public:
-    Vector2 point;
-    Vector2 target;
-    double rate;
-    VectorEaser() : point(),target(),rate(0) { }
-    VectorEaser(Vector2 upoint,Vector2 utarget,double urate) : point(upoint),target(utarget),rate(urate) { }
-    Vector2 easeexp(double dt) {
-        point=(point-target)*exp(-rate*dt)+target;
-        return point;
-    }
-    Vector2 easelinear(double dt) {
-        double d=(point-target).length();
-        if (d<rate*dt)
-            point=target;
-        else
-            point=point+(target-point)*rate*dt/d;
-        return point;
-    }
-};
 
 class GSArena;
 

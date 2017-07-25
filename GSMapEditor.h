@@ -23,6 +23,7 @@ class GSMapEditor
 public:
     ArenaMap map;
     Camera cam;
+    DraggingCameraController camController;
 
     GSMapEditor();
     void initialize();

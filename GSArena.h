@@ -64,6 +64,7 @@ class GSArena
 public:
     ArenaMap map;
     Camera cam;
+    DraggingCameraController camController;
     CharMan charman;
 
     GSArena();

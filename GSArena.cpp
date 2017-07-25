@@ -106,8 +106,8 @@ void CharMan::killActiveCharacter() {
 }
 
 
-GSArena::GSArena() : back(),stateChange(0),map(),gameOver(false),cam() {
-    cam.setDraggable();
+GSArena::GSArena() : back(),stateChange(0),map(),gameOver(false),cam(),camController() {
+    
 }
 
 //returns stateChange
@@ -119,6 +119,10 @@ void GSArena::resetStateChange() {
 }
 
 void GSArena::initialize() {
+    camController.attachCamera(&cam);
+    camController.setDraggable();
+    camController.setDragButton(2);
+
     //Initialize and position the main screen buttons
     Texture p=loadTexture("media/backbutton_pressed.png");
     Texture up=loadTexture("media/backbutton.png");
@@ -163,7 +167,7 @@ void GSArena::timestep(double dt) {
         reset();
         resetButton.pressReceived();
     }
-    cam.timestep(dt);
+    camController.timestep(dt);
     charman.timestep(dt,this);
 }
 void GSArena::render() {
@@ -187,7 +191,7 @@ void GSArena::handleEvent(SDL_Event *e) {
     g.mouseCapturedByGUI=g.mouseCapturedByGUI||back.handleEvent(e);
     g.mouseCapturedByGUI=g.mouseCapturedByGUI||resetButton.handleEvent(e);
     if (!g.mouseCapturedByGUI) 
-        cam.handleEvent(e);
+        camController.handleEvent(e);
     
 	
     charman.handleEvent(e, this);
