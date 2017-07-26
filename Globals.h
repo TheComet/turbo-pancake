@@ -4,6 +4,7 @@
 #include "SDL_mixer.h"
 #include <iostream>
 #include "Sound.h"
+#include "Texture.h"
 
 //Just so we can make the globals super explicit (and call them as g.renderer, g.font, etc.) 
 struct Globals {
@@ -14,6 +15,8 @@ struct Globals {
     TTF_Font *font28;
     TTF_Font *font16bold;
     Sound defaultClickSound;
+
+    Texture bloodsplat;
 
     bool mouseCapturedByGUI;
 

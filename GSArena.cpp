@@ -148,6 +148,7 @@ void GSArena::resetStateChange() {
 }
 
 void GSArena::initialize() {
+    stickers=Stickers();
     camController.attachCamera(&cam);
     //camController.setDraggable();
     //camController.setDragButton(2);
@@ -172,6 +173,7 @@ void GSArena::initialize() {
 }
 
 void GSArena::reset() {
+    stickers=Stickers();
     charman=CharMan();
     std::vector<IntegerPoint> sp1=map.getSpawnablePoints(0);
     std::vector<IntegerPoint> sp2=map.getSpawnablePoints(1);
@@ -180,11 +182,12 @@ void GSArena::reset() {
     int c=rand()%sp2.size();
     int d=rand()%sp2.size();
 
-    Texture charactertexture=loadTexture("media/character.png"); //only load texture once for four characters.
-    charman.addChar(TestCharacter(sp1[a].x,sp1[a].y,4,150,charactertexture,Sound()),true);
-    charman.addChar(TestCharacter(sp1[b].x,sp1[b].y,4,150,charactertexture,Sound()));
-    charman.addChar(TestCharacter(sp2[c].x,sp2[c].y,4,150,charactertexture,Sound()));
-    charman.addChar(TestCharacter(sp2[d].x,sp2[d].y,4,150,charactertexture,Sound()));
+    //Loading the texture four times creates four separate textures that can be colored
+    //separately. 
+    charman.addChar(TestCharacter(sp1[a].x,sp1[a].y,4,150,loadTexture("media/character.png"),Sound()),true);
+    charman.addChar(TestCharacter(sp1[b].x,sp1[b].y,4,150,loadTexture("media/character.png"),Sound()));
+    charman.addChar(TestCharacter(sp2[c].x,sp2[c].y,4,150,loadTexture("media/character.png"),Sound()));
+    charman.addChar(TestCharacter(sp2[d].x,sp2[d].y,4,150,loadTexture("media/character.png"),Sound()));
 }
 
 //Timestep. Calls timestep on the current active game state.
@@ -208,7 +211,9 @@ void GSArena::timestep(double dt) {
 }
 void GSArena::render() {
     map.render(cam);
+    stickers.render(cam);
     charman.render(cam);
+
     back.render();
     resetButton.render();
 	plist.render(cam);
@@ -223,7 +228,6 @@ void GSArena::handleEvent(SDL_Event *e) {
 		//test directional burst
         Character *ch=charman.getActiveCharacter();
         if (ch!=nullptr) {
-            charman.getActiveCharacter()->getPos();
             std::cout << "charman: " << ch->getPos() << std::endl;
             plist.addDirectionalBurst(ch->getPos(),90,15,0.35f,20,10,2,"media/team2spawn.png",.05f);
         }

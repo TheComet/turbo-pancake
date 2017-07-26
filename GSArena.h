@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Character.h"
 #include "ArenaMap.h"
+#include "Stickers.h"
 
 
 class GSArena;
@@ -57,6 +58,10 @@ public:
 
     //returns true in a game over scenario: like if all the characters are dead.
     bool isGameOver();
+
+    CharacterList *getChars() {
+        return &list;
+    }
 };
 
 
@@ -74,6 +79,8 @@ public:
     Camera cam;
     FollowerCameraController camController;
     CharMan charman;
+    Stickers stickers;
+
 
     GSArena();
     void initialize();

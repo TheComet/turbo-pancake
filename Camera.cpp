@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include <cmath>  
+#include "Globals.h"
 
 
 Camera::Camera() : pos(),multiplier(50) { }

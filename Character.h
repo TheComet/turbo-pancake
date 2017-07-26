@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include "Vector2.h"
+#include "Sound.h"
 #include <vector>
 
 
@@ -8,11 +9,8 @@
 class GSArena;
 
 class Character {
-
-protected: 
-
-
     virtual Character* unsafe_copy() const =0;
+protected: 
 
     bool isdead; // true if the character is dead and should no longer be controlled by the player
     bool shoulddelete; //true if the character is done drawing and doing w/e and should be removed/deallocated from gameplay.
@@ -31,6 +29,9 @@ public:
 	virtual void timestep(double dt,GSArena *gs);
 	virtual void handleEvent(SDL_Event *e, GSArena *gs); //default implementation passes stuff to move.
 	virtual void render(const Camera& arg)=0;
+
+    //Attack/whatever code.
+    virtual void dealDamage(double arg, Character *damageDealer)=0;
 
     //The idea with this movement interface is that you should be able to control
     //any type of creature! Maybe as an easter egg or something. So that if we make a 
@@ -110,6 +111,8 @@ class TestCharacter : public Character {
     double attackDuration;
     VectorEaser shieldpos;
     VectorEaser swordpos;
+    double health;
+    double damage;
 
     TestCharacter* unsafe_copy() const override;
 public:
@@ -121,6 +124,8 @@ public:
 
     void timestep(double dt, GSArena *gs) override;
 	void render(const Camera& arg) override;
+
+    void dealDamage(double arg,Character *damageDealer) override;
 
     //move in the positive x direction
     void moveRight() override; 
@@ -137,6 +142,7 @@ public:
     void attack() override;
     void block() override;
     void idle() override;
+    void kill() override;
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;

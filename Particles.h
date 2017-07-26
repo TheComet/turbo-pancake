@@ -18,7 +18,7 @@ protected:
 	double xvel;
 	double yvel;
 	bool canRemove;
-	double delay; //if not all particles at once. in ms
+	double delay; //if not all particles at once. in seconds
 
 public:
 	Particle(Vector2 position, double s, double xv, double yv, double life = 1, double delay = 0) : pos(position), size(s), xvel(xv), yvel(yv), lifetime(life), elapsed(0), canRemove(false), delay(delay) {}
@@ -41,14 +41,14 @@ public:
 
 class TextureParticle : public Particle {
 	//efficiency purposes, lets only load the texture once
-	Texture* img;
+	Texture img;
 public:
-	TextureParticle(Vector2 position, double siz, double xvel, double yvel, double life, double delay, Texture *t) : Particle(position, siz, xvel, yvel, life, delay) {
+	TextureParticle(Vector2 position, double siz, double xvel, double yvel, double life, double delay, Texture t) : Particle(position, siz, xvel, yvel, life, delay) {
 		img = t;
 	}
 	void render(const Camera& arg) override {
 		if (elapsed >= delay)
-			arg.renderTexture(*img, pos.x - 0.5, pos.y - 0.5, 0, size);
+			arg.renderTexture(img, pos.x - 0.5, pos.y - 0.5, 0, size);
 	}
 };
 
@@ -56,21 +56,27 @@ public:
 class ParticleList {
 
 	std::vector<std::vector<Particle*> > list;
-	std::vector<Texture*> freelist;
+    void clearAllParticles() {
+        
+    }
+
+    //Disable copy constructor and assignment.
+    ParticleList(const ParticleList& srcMyClass);
+    ParticleList& operator=(const ParticleList& srcMyClass);
 
 public:
 	//empty constructor
 	ParticleList() {}
 	~ParticleList() {
-		for (auto it = freelist.begin(); it != freelist.end(); it++) {
-			delete *it;
-		}
+        for (auto a=list.begin();a!=list.end();a++)
+            for (auto b=(*a).begin();b!=(*a).end();b++)
+                if (*b !=nullptr)
+                    delete *b;
+        list.clear();
 	}
-	void addBurst(Vector2 pos, double s, int numParticles, int maxspeed, double life, std::string txtpath, double spawndelay = 0) {
+	void addBurst(Vector2 pos, double s, int numParticles, int maxspeed, double life, std::string texpath, double spawndelay = 0) {
 		std::vector<Particle *> toadd;
-		Texture * t = new Texture();
-		t->load(txtpath);
-		freelist.push_back(t);
+		Texture t = loadTexture(texpath);
 
 		for (int i = 0; i < numParticles; i++) {
 			double xv = (rand() / (double)RAND_MAX * 2 * maxspeed) - maxspeed;
@@ -80,11 +86,9 @@ public:
 
 		list.push_back(toadd);
 	}
-	void addDirectionalBurst(Vector2 pos, double initangle, double incidentangle, double s, int numParticles, int maxspeed, double life, std::string txtpath, double spawndelay = 0) {
+	void addDirectionalBurst(Vector2 pos, double initangle, double incidentangle, double s, int numParticles, int maxspeed, double life, std::string texpath, double spawndelay = 0) {
 		std::vector<Particle *> toadd;
-		Texture * t = new Texture();
-		t->load(txtpath);
-		freelist.push_back(t);
+        Texture t = loadTexture(texpath);
 
 		for (int i = 0; i < numParticles; i++) {
 			double angle = ((rand() / (double)RAND_MAX * 2 * incidentangle) - incidentangle + initangle) * M_PI / 180.0;

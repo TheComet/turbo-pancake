@@ -1,4 +1,5 @@
 #include "GSMapEditor.h"
+#include "Globals.h"
 
 
 

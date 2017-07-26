@@ -128,7 +128,7 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     angle(0),targetAngle(0),lookSpeed(0),lastLookAt(0),
     //Attack initialization
     attackmode(AttackMode::idlestate),attackStarted(0),attackDuration(0),
-    shieldpos(),swordpos()
+    shieldpos(),swordpos(),health(10),damage(1)
 {
     //textures
     character=img;
@@ -155,8 +155,25 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
 
 }
 
+void TestCharacter::dealDamage(double arg,Character *damageDealer) {
+    if (damageDealer!=this) {
+        health-=arg;
+        if (health<0)
+            kill();
+        else if(health<5) {
+            character.setColor(255,(Uint8)(health*255/5),(Uint8)(health*255/5));
+        }
+    }
+}
 void TestCharacter::timestep(double dt, GSArena *gs) {
-    Character::timestep(dt,gs);
+    Character::timestep(dt,gs); //handles player input if it is being received!!
+
+
+    if (isDead() && !shouldDelete()) {
+        gs->stickers.addSticker(g.bloodsplat,pos,0,1);
+        shoulddelete=true;
+        return;
+    }
 
     vel+=acc*dt;
     //0 the vector if it gets too small.
@@ -207,6 +224,20 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
 
     swordpos.easeexp(dt);
     shieldpos.easeexp(dt);
+
+    if(attackmode==AttackMode::attackstate){
+        double Deltat=(SDL_GetTicks()-attackStarted)*0.001;
+        double swordoffset=60.0*M_PI/180.0 - Deltat/attackDuration*120*M_PI/180.0;
+        double c3=cos(angle-swordoffset);
+        double s3=sin(angle-swordoffset);
+        double xcoll=pos.x+swordpos.point.x-s3*1.3;
+        double ycoll=pos.y+swordpos.point.y+c3*1.3;
+        CharacterList &cr=*(gs->charman.getChars());
+        for (auto i=cr.begin();i!=cr.end();i++) {
+            if (doesCirclePointCollide((*i)->getPos(),(*i)->getCharacterRadius(),Vector2(xcoll,ycoll)))
+                (*i)->dealDamage(damage,this);
+        }
+    }
 }
 void TestCharacter::attack() {
     if (attackmode==AttackMode::idlestate) {
@@ -225,6 +256,7 @@ void TestCharacter::idle() {
         attackmode=AttackMode::idlestate;
 
 }
+void TestCharacter::kill() { setDead(true); }
 
 
 void TestCharacter::render(const Camera& arg){

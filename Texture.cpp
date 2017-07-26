@@ -1,7 +1,10 @@
+
+#include "Globals.h"
 #include "Texture.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 #include <string>
+
 using namespace std;
 
 Texture::Texture() : mTexture(nullptr), width(0), height(0) {}

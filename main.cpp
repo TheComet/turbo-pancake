@@ -97,6 +97,9 @@ bool init() {
     g.defaultClickSound=Sound();
     g.defaultClickSound.load("media/audio/knifeSlice.ogg");
 
+    g.bloodsplat=loadTexture("media/bloodsplat.png");
+    g.bloodsplat.setAlpha(200);
+
 	return true;
 }
 

@@ -1,4 +1,6 @@
 #include "CollisionUtil.h"
+#include "Globals.h"
+
 
 Line::Line() : p1(),p2() { }
 Line::Line(double a,double b,double c,double d) : p1(a,b),p2(c,d) { }
@@ -23,6 +25,9 @@ double Rectangle::getWidth() { return x1-x0; }
 double Rectangle::getHeight() { return y1-y0; }
 void Rectangle::render(const Camera& c) { }
 
+bool doesCirclePointCollide(Vector2 &circlepos,double r,Vector2 point) {
+    return (circlepos-point).length()<r;
+}
 //Pushes a circle so it is no longer intersect with a point. So (  .)  -> (   ). :)
 void circlePointCollide(Vector2 &circlepos,double r,Vector2 point) {
     Vector2 diff=circlepos-point;

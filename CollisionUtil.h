@@ -23,6 +23,8 @@ struct Rectangle {
     void render(const Camera& c);
 };
 
+bool doesCirclePointCollide(Vector2 &circlepos,double r,Vector2 point);
+
 //Pushes a circle so it is no longer intersecting with a point. So (  .)  -> (   ). :)
 //Updates the value of circlepos to the new position.
 void circlePointCollide(Vector2 &circlepos,double r,Vector2 point);

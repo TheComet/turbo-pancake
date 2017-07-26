@@ -1,4 +1,5 @@
 #include "GSNoot.h"
+#include "Globals.h"
 
 GSNoot::GSNoot() : back(),x(),y(),texts(),nootmusic(),stateChange(0) { }
 
