@@ -58,6 +58,8 @@ public:
     virtual void kill();
 
 
+    virtual Vector2 getPos()=0;
+
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;
 };
@@ -105,21 +107,21 @@ class TestCharacter : public Character {
 
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
-	~TestCharacter() {}
+    Vector2 getPos() override;
 
     void timestep(double dt, GSArena *gs) override;
 	//void handleEvent(SDL_Event *e, GSArena *gs) override;
 	void render(const Camera& arg) override;
 
-    void moveRight(); //move in the positive x direction
-    void moveLeft(); //move in the positive x direction
-    void moveUp(); //move in the NEGATIVE y direction (screen space up!)
-    void moveDown(); //move in the positive y direction
-    void moveDir(double x,double y); //move in a certain direction (magnitude is ignored)
-    void lookAt(double x,double y,bool showIcon=true); //look at the world coordinate x,y.
-    void attack();
-    void block();
-    void idle();
+    void moveRight() override; //move in the positive x direction
+    void moveLeft() override; //move in the positive x direction
+    void moveUp() override; //move in the NEGATIVE y direction (screen space up!)
+    void moveDown() override; //move in the positive y direction
+    void moveDir(double x,double y) override; //move in a certain direction (magnitude is ignored)
+    void lookAt(double x,double y,bool showIcon=true) override; //look at the world coordinate x,y.
+    void attack() override;
+    void block() override;
+    void idle() override;
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;

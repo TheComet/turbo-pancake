@@ -61,6 +61,169 @@ void CameraController::timestep(double dt) { }
 
 
 
+/*
+
+
+    //camera velocity
+    Vector2 v;
+
+    //exponential drag coefficient.
+    double drag;
+
+    //max velocity
+    double maxv;
+
+    //how fast to pan towards the character if it is offscreen
+    double panv;
+
+    //true if our current goal is to center the character onscreen.
+    bool goalIsToCenter;
+
+
+
+    Vector2 targetWorldPosition;
+    int targetRectangleW;
+    int targetRectangleH;
+    double targetBandStrength;
+
+    Vector2 mousePixelPosition;
+    int mouseRectangleW;
+    int mouseRectangleH;
+    double mouseBandStrength;
+    */
+    //resets v and goalIsToCenter.
+FollowerCameraController::FollowerCameraController() : v(),drag(5),maxv(100),panv(20),panacc(100), goalIsToCenter(false),
+    targetWorldPosition(),targetRectangleW(0),targetRectangleH(0),targetBandStrength(100),
+    mousePixelPosition(),mouseRectangleW(0),mouseRectangleH(0),mouseBandStrength(50) { 
+    targetRectangleW=(int)((2.0/3.0-0.05)*g.scWidth);
+    targetRectangleH=(int)((2.0/3.0-0.05)*g.scHeight);
+    mouseRectangleW=(int)((2.0/3.0)*g.scWidth);
+    mouseRectangleH=(int)((2.0/3.0)*g.scHeight);
+}
+void FollowerCameraController::resetState() {
+    v=Vector2();
+    goalIsToCenter=false;
+}
+
+bool FollowerCameraController::mouseInRectangle() {
+    int l=g.scWidth/2-mouseRectangleW/2;
+    int r=g.scWidth/2+mouseRectangleW/2;
+    int u=g.scHeight/2-mouseRectangleH/2;
+    int d=g.scHeight/2+mouseRectangleH/2;
+    int x=(int)mousePixelPosition.x;
+    int y=(int)mousePixelPosition.y;
+    return (x>=l && x<r && y>=u && y<d);
+
+}
+bool FollowerCameraController::targetInRectangle() {
+    if (!cameraValid())
+        return false;
+    Vector2 targetPixelPosition=camP->worldToPixels(targetWorldPosition);
+
+    int l=g.scWidth/2-targetRectangleW/2;
+    int r=g.scWidth/2+targetRectangleW/2;
+    int u=g.scHeight/2-targetRectangleH/2;
+    int d=g.scHeight/2+targetRectangleH/2;
+    int x=(int)targetPixelPosition.x;
+    int y=(int)targetPixelPosition.y;
+    return (x>=l && x<r && y>=u && y<d);
+}
+
+void FollowerCameraController::setTargetPosition(Vector2 pt) {
+    targetWorldPosition=pt;
+}
+
+//immediately center the target.
+void FollowerCameraController::forceCenterTarget() {
+    if (!cameraValid())
+        return;
+    camP->setPos(targetWorldPosition);
+}
+
+//transition/pan over time so that the target is centered.
+void FollowerCameraController::centerTarget() {
+    goalIsToCenter=true;
+}
+
+//sets cameraPointer to null. Also zeroes internal state like camera velocity.
+void FollowerCameraController::detachCamera() {
+    CameraController::detachCamera();
+    resetState();
+}
+
+//Handle dragging mouse input.
+bool FollowerCameraController::handleEvent(SDL_Event *e) {
+    return false;
+}
+
+//Update internal state (velocity, friction, etc.)
+void FollowerCameraController::timestep(double dt) {
+    mousePixelPosition=Vector2(g.mousex,g.mousey);
+    if (!cameraValid())
+        return;
+    if (!goalIsToCenter) {
+        Vector2 force;
+
+        //define "screen vectors" to be 0 at the center of the screen, "(-1,0)" at the left of the screen, and
+        //"(1,0)" at the right of the screen.
+
+        Vector2 mouseScreenVector=Vector2();
+        if (!mouseInRectangle()) {
+            mouseScreenVector=(mousePixelPosition-Vector2(g.scWidth/2.0,g.scHeight/2.0))/((double)g.scWidth/2.0);
+        }
+
+        Vector2 targetScreenVector=Vector2();
+        //if (!targetInRectangle()) {
+            Vector2 targetPixelPosition=camP->worldToPixels(targetWorldPosition);
+            targetScreenVector=(targetPixelPosition-Vector2(g.scWidth/2.0,g.scHeight/2.0))/((double)g.scWidth/2.0);
+        //}
+
+        force=targetScreenVector*targetBandStrength+mouseScreenVector*mouseBandStrength;
+
+        camP->setPos(camP->getPos()+v*dt);
+        v=v+force*dt;
+        v*=exp(-dt*drag);
+        
+    }
+    else {
+        //goal is to center, set velocity!
+        Vector2 diff=(targetWorldPosition-camP->getPos());
+        double d=diff.length();
+        double vmag=v.length();
+        double cutoffdist=fmax(vmag/drag,1);
+
+        if (d<cutoffdist) {
+            goalIsToCenter=false;
+            camP->setPos(camP->getPos()+v*dt);
+        }
+        else {
+            if (vmag-0.001<panv) {
+                //if we haven't reached max speed yet, accelerate.
+                vmag+=panacc*dt;
+                //if we've just gone over, set equal to panv.
+                if (vmag>panv)
+                    vmag=panv;
+            }
+            else {
+                vmag=panv;
+            }
+            v=diff*vmag/d;
+            camP->setPos(camP->getPos()+v*dt);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 DraggingCameraController::DraggingCameraController() : CameraController(), cameradraggable(false),v(),drag(10),maxv(200),mousedragpos(),mousedragpospixels(), lastpos(),dragging(false),dragbutton(-1),lastdt(0.01) { }
 
 //resets v, mousedragpos,mousedragpospixels,dragging, and lastdt.

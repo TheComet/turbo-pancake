@@ -92,6 +92,9 @@ void Character::handleEvent(SDL_Event *e,GSArena *gs) {
     }
 }
 
+Vector2 TestCharacter::getPos() {
+    return pos;
+}
 void TestCharacter::moveRight() {
     acc.x+=accMagnitude;
     if (acc.length()>0)

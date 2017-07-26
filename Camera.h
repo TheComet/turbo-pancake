@@ -52,6 +52,67 @@ public:
     virtual void timestep(double dt);
 };
 
+class FollowerCameraController : public CameraController {
+    //camera velocity
+    Vector2 v; 
+
+    //exponential drag coefficient.
+    double drag;
+
+    //max velocity
+    double maxv; 
+    
+    //how fast to pan towards the character if it is offscreen
+    double panv; 
+    double panacc;
+    
+    //true if our current goal is to center the character onscreen.
+    bool goalIsToCenter; 
+
+    /* 
+    So, FollowerCameraController works like this: if the target pixel position (calculated through 
+    camP->worldToPixels(targetWorldPosition)) leaves the bounding rectangle (width W, height H, 
+    centered on screen), the camera feels a force proportional to targetBandStrength trying to get 
+    the target back on screen. This competes with a force from the mouse which occurs if the mouse
+    leaves the on screen mouseRectangle and is proportional to mouseBandStrength.
+    */
+
+    Vector2 targetWorldPosition;
+    int targetRectangleW;
+    int targetRectangleH;
+    double targetBandStrength;
+
+    Vector2 mousePixelPosition;
+    int mouseRectangleW;
+    int mouseRectangleH;
+    double mouseBandStrength;
+
+    //resets v and goalIsToCenter.
+    void resetState();
+
+    bool mouseInRectangle();
+    bool targetInRectangle();
+public:
+    FollowerCameraController();
+    
+    void setTargetPosition(Vector2 pt);
+
+    //immediately center the target.
+    void forceCenterTarget();
+
+    //transition/pan over time so that the target is centered.
+    void centerTarget();
+
+    //sets cameraPointer to null. Also zeroes internal state like camera velocity.
+    void detachCamera() override;
+
+    //Handle dragging mouse input.
+    bool handleEvent(SDL_Event *e) override;
+
+    //Update internal state (velocity, friction, etc.)
+    void timestep(double dt) override;
+};
+
 class DraggingCameraController : public CameraController {
 
     bool cameradraggable; //if false, handleEvent does nothing.

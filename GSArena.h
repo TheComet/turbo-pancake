@@ -37,10 +37,15 @@ public:
     //Add a character. If assignControl is true, control is switched to this new character. 
     void addChar(const Character& chr, bool assignControl=false);
 
-    //core game logic:
+    //calls timestep on all sub-units:
     void timestep(double dt,GSArena *const gs);
+    //calls handleEvent on all sub-units:
     void handleEvent(SDL_Event *e,GSArena *const gs);
+    //calls render on all sub-units:
     void render(Camera& arg);
+
+    //returns the active character. Returns nullptr if there is no active character.
+    Character *getActiveCharacter();
 
     void killActiveCharacter();
 
@@ -64,7 +69,7 @@ class GSArena
 public:
     ArenaMap map;
     Camera cam;
-    DraggingCameraController camController;
+    FollowerCameraController camController;
     CharMan charman;
 
     GSArena();

@@ -105,6 +105,11 @@ void CharMan::killActiveCharacter() {
     list[currentlyControlled].kill();
 }
 
+Character *CharMan::getActiveCharacter() {
+    if (currentlyControlled<0)
+        return nullptr;
+    return &list[currentlyControlled];
+}
 
 GSArena::GSArena() : back(),stateChange(0),map(),gameOver(false),cam(),camController() {
     
@@ -120,8 +125,9 @@ void GSArena::resetStateChange() {
 
 void GSArena::initialize() {
     camController.attachCamera(&cam);
-    camController.setDraggable();
-    camController.setDragButton(2);
+    //camController.setDraggable();
+    //camController.setDragButton(2);
+    camController.centerTarget();
 
     //Initialize and position the main screen buttons
     Texture p=loadTexture("media/backbutton_pressed.png");
@@ -167,6 +173,11 @@ void GSArena::timestep(double dt) {
         reset();
         resetButton.pressReceived();
     }
+
+    Character *target=charman.getActiveCharacter();
+    if(target!=nullptr)
+        camController.setTargetPosition(target->getPos());
+
     camController.timestep(dt);
     charman.timestep(dt,this);
 }
@@ -177,11 +188,14 @@ void GSArena::render() {
     resetButton.render();
 }
 void GSArena::handleEvent(SDL_Event *e) {
-	if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_PERIOD)
+    if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_PERIOD) {
         charman.switchControl();
+        camController.centerTarget();
+    }
 	else if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_k) {
         charman.killActiveCharacter();
         charman.switchControl();
+        camController.centerTarget();
 		if (charman.isGameOver()) {
 			gameOver = true;
 			//do gameOver rendering stuff somewhere TODO
