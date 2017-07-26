@@ -7,6 +7,7 @@
 #include "Character.h"
 #include "ArenaMap.h"
 #include "Stickers.h"
+#include "Particles.h"
 
 
 class GSArena;
@@ -80,6 +81,7 @@ public:
     FollowerCameraController camController;
     CharMan charman;
     Stickers stickers;
+    ParticleList plist;
 
 
     GSArena();

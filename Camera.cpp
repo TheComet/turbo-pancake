@@ -18,6 +18,17 @@ void Camera::renderTexture(Texture &arg,double wx,double wy,double angle,double 
     arg.renderScaled((int)((wx-pos.x)*multiplier+g.scWidth/2-width/2.0*multiplier),(int)((wy-pos.y)*multiplier+g.scHeight/2-width/2.0*multiplier),(int)(width*multiplier),(int)(width*multiplier),nullptr,angle);
 }
 
+void Camera::renderTextureHeight(Texture &arg,double wx,double wy,double angle,double height) const {
+    double width=height*arg.getWidth()/(double)arg.getHeight();
+    arg.renderScaled((int)((wx-pos.x)*multiplier+g.scWidth/2-width/2.0*multiplier),(int)((wy-pos.y)*multiplier+g.scHeight/2-height/2.0*multiplier),(int)(width*multiplier),(int)(height*multiplier),nullptr,angle);
+}
+
+void Camera::renderTextureWidth(Texture &arg,double wx,double wy,double angle,double width) const {
+    double height=width*arg.getHeight()/(double)arg.getWidth();
+    arg.renderScaled((int)((wx-pos.x)*multiplier+g.scWidth/2-width/2.0*multiplier),(int)((wy-pos.y)*multiplier+g.scHeight/2-height/2.0*multiplier),(int)(width*multiplier),(int)(height*multiplier),nullptr,angle);
+
+}
+
 //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
 void Camera::renderTile(Texture &arg,double wx,double wy,double width) const {
     int pixelx=(int)floor((wx-pos.x)*width*multiplier+g.scWidth/2);
@@ -173,11 +184,8 @@ void FollowerCameraController::timestep(double dt) {
             mouseScreenVector=(mousePixelPosition-Vector2(g.scWidth/2.0,g.scHeight/2.0))/((double)g.scWidth/2.0);
         }
 
-        Vector2 targetScreenVector=Vector2();
-        //if (!targetInRectangle()) {
-            Vector2 targetPixelPosition=camP->worldToPixels(targetWorldPosition);
-            targetScreenVector=(targetPixelPosition-Vector2(g.scWidth/2.0,g.scHeight/2.0))/((double)g.scWidth/2.0);
-        //}
+        Vector2 targetPixelPosition=camP->worldToPixels(targetWorldPosition);
+        Vector2 targetScreenVector=(targetPixelPosition-Vector2(g.scWidth/2.0,g.scHeight/2.0))/((double)g.scWidth/2.0);
 
         force=targetScreenVector*targetBandStrength+mouseScreenVector*mouseBandStrength;
 

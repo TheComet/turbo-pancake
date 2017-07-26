@@ -7,9 +7,6 @@ using namespace std;
 
 CharMan::CharMan() : list(), currentlyControlled(-1) {}
 
-//list of particle effects
-ParticleList plist;
-
 void CharMan::removeChar(int toRemove) {
     Character &c=list[toRemove];
     if (c.isPlayerControlled()) {

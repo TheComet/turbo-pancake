@@ -18,6 +18,14 @@ public:
     //Render texture on the screen. wx and wy are in tile coordinates. width is in terms of tiles.
     void renderTexture(Texture &arg,double wx,double wy,double angle,double width) const;
 
+    //render texture on the screen. Preserve aspect ratio and set the texture height to a value
+    //given in world units.
+    void renderTextureHeight(Texture &arg,double wx,double wy,double angle,double height) const;
+
+    //render texture on the screen. Preserve aspect ratio and set the texture width to a value
+    //given in world units.
+    void renderTextureWidth(Texture &arg,double wx,double wy,double angle,double width) const;
+
     //Rendering a tile ensures that the square image is drawn from the floor of the leftmost pixel 
     //to the ceil of the rightmost pixel, so that you don't get off-by-one visual errors like 
     //pixel-wide gaps between adjacent tiles.

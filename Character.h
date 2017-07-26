@@ -21,6 +21,16 @@ protected:
     bool playerIsMovingDown;
     bool playerIsMovingRight;
     bool playerIsMovingLeft;
+
+    struct InvulnerableList {
+        Character *c;
+        double t;
+    };
+
+    std::vector<InvulnerableList> invulnerableList;
+
+    double health;
+
 public:
 
     Character();
@@ -31,7 +41,7 @@ public:
 	virtual void render(const Camera& arg)=0;
 
     //Attack/whatever code.
-    virtual void dealDamage(double arg, Character *damageDealer)=0;
+    virtual bool dealDamage(double arg,Character *damageDealer,double invulnerabletime=0.15);
 
     //The idea with this movement interface is that you should be able to control
     //any type of creature! Maybe as an easter egg or something. So that if we make a 
@@ -111,7 +121,6 @@ class TestCharacter : public Character {
     double attackDuration;
     VectorEaser shieldpos;
     VectorEaser swordpos;
-    double health;
     double damage;
 
     TestCharacter* unsafe_copy() const override;
@@ -125,7 +134,6 @@ public:
     void timestep(double dt, GSArena *gs) override;
 	void render(const Camera& arg) override;
 
-    void dealDamage(double arg,Character *damageDealer) override;
 
     //move in the positive x direction
     void moveRight() override; 
@@ -143,6 +151,7 @@ public:
     void block() override;
     void idle() override;
     void kill() override;
+    bool dealDamage(double arg,Character *damageDealer,double invulnerabletime=0.15);
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;

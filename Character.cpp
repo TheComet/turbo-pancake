@@ -9,7 +9,7 @@ playercontrolled(false),
 playerIsMovingUp(false),
 playerIsMovingDown(false),
 playerIsMovingRight(false),
-playerIsMovingLeft(false) { }
+playerIsMovingLeft(false),health(10) { }
 
 bool Character::isDead()  const { return isdead; }
 bool Character::shouldDelete()  const { return shoulddelete;  }
@@ -19,6 +19,19 @@ bool Character::isPlayerControlled() const { return playercontrolled; }
 void Character::setPlayerControlled(bool arg) { playercontrolled=arg; }
 void Character::kill() { setDead(true); setDelete(true); }
 
+bool Character::dealDamage(double arg,Character *damageDealer,double invulnerabletime) {
+    bool invulnerable=false;
+    for (auto i=invulnerableList.begin();i!=invulnerableList.end();i++) {
+        if ((*i).c==damageDealer) {
+            invulnerable=true;
+        }
+    }
+    if (!invulnerable) {
+        health-=arg;
+        invulnerableList.push_back({damageDealer,invulnerabletime});
+    }
+    return !invulnerable;
+}
 bool Character::isPushable() { return false; }
 
 void Character::timestep(double dt,GSArena *gs) {
@@ -33,6 +46,14 @@ void Character::timestep(double dt,GSArena *gs) {
             moveLeft();
         Vector2 fpos=gs->cam.pixelsToWorld(Vector2(g.mousex,g.mousey));
         lookAt(fpos.x,fpos.y,false);
+    }
+    auto i=invulnerableList.begin();
+    while(i!=invulnerableList.end()) {
+        (*i).t-=dt;
+        if ((*i).t<0)
+            i=invulnerableList.erase(i);
+        else
+            i++;
     }
 }
 void Character::handleEvent(SDL_Event *e,GSArena *gs) {
@@ -128,7 +149,7 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     angle(0),targetAngle(0),lookSpeed(0),lastLookAt(0),
     //Attack initialization
     attackmode(AttackMode::idlestate),attackStarted(0),attackDuration(0),
-    shieldpos(),swordpos(),health(10),damage(1)
+    shieldpos(),swordpos(),damage(1)
 {
     //textures
     character=img;
@@ -155,15 +176,14 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
 
 }
 
-void TestCharacter::dealDamage(double arg,Character *damageDealer) {
-    if (damageDealer!=this) {
-        health-=arg;
-        if (health<0)
-            kill();
-        else if(health<5) {
-            character.setColor(255,(Uint8)(health*255/5),(Uint8)(health*255/5));
-        }
+bool TestCharacter::dealDamage(double arg,Character *damageDealer,double invulnerabletime) {
+    bool ret=Character::dealDamage(arg,damageDealer, invulnerabletime);
+    if (health<0)
+        kill();
+    else if(health<5) {
+        character.setColor(255,(Uint8)(health*255/5),(Uint8)(health*255/5));
     }
+    return ret;
 }
 void TestCharacter::timestep(double dt, GSArena *gs) {
     Character::timestep(dt,gs); //handles player input if it is being received!!
@@ -230,12 +250,18 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
         double swordoffset=60.0*M_PI/180.0 - Deltat/attackDuration*120*M_PI/180.0;
         double c3=cos(angle-swordoffset);
         double s3=sin(angle-swordoffset);
-        double xcoll=pos.x+swordpos.point.x-s3*1.3;
-        double ycoll=pos.y+swordpos.point.y+c3*1.3;
+        double xcoll=pos.x+swordpos.point.x-s3*1;
+        double ycoll=pos.y+swordpos.point.y+c3*1;
         CharacterList &cr=*(gs->charman.getChars());
         for (auto i=cr.begin();i!=cr.end();i++) {
-            if (doesCirclePointCollide((*i)->getPos(),(*i)->getCharacterRadius(),Vector2(xcoll,ycoll)))
-                (*i)->dealDamage(damage,this);
+            if (doesCirclePointCollide((*i)->getPos(),(*i)->getCharacterRadius(),Vector2(xcoll,ycoll))) {
+                if ((*i)->dealDamage(damage,this)) {
+                    double x0 = rand() / (double)RAND_MAX -0.5;
+                    double y0 = rand() / (double)RAND_MAX -0.5;
+                    gs->plist.addTextParticle((*i)->getPos()+Vector2(x0,y0),0.35,{200,0,0},"Ow!!!!!");
+
+                }
+            }
         }
     }
 }
