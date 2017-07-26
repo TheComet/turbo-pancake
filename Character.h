@@ -65,18 +65,26 @@ public:
 };
 
 class TestCharacter : public Character {
+    //so many variables that it's important to organize them correctly!
+
+    // ======================= Textures ======================= 
+    Texture character;
+    Texture sword;
+    Texture shield;
+    //Icon to display when the character looks somewhere else.
+    Texture directionIcon;
+
+    // ======================= Sounds ======================= 
     Sound deathSound;
+
+    // ======================= Movement ======================= 
+    Vector2 pos;
+    Vector2 vel;
     Vector2 acc;
     double accMagnitude;
-    Vector2 vel;
-    Vector2 pos;
     double speedcap; // velocity cap
 
-    Texture t;
-    bool controlled;
-
-    TestCharacter* unsafe_copy() const override;
-
+    // ======================= Angle ======================= 
     //Angle in radians
     double angle;
     //Angle to look towards
@@ -85,40 +93,38 @@ class TestCharacter : public Character {
     double lookSpeed;
     //time since the character looked somewhere else.
     Uint32 lastLookAt;
-    //Icon to display when the character looks somewhere else.
-    Texture directionIcon;
 
-    Texture sword;
-    Texture shield;
+    // ======================= Attack ======================= 
     enum AttackMode {
         idlestate,
         attackstate,
         blockstate
-    };
-
-    AttackMode attackmode;
+    }  attackmode;
     Uint32 attackStarted;
     double attackDuration;
-
     VectorEaser shieldpos;
     VectorEaser swordpos;
-    
 
-
+    TestCharacter* unsafe_copy() const override;
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
     Vector2 getPos() override;
 
     void timestep(double dt, GSArena *gs) override;
-	//void handleEvent(SDL_Event *e, GSArena *gs) override;
 	void render(const Camera& arg) override;
 
-    void moveRight() override; //move in the positive x direction
-    void moveLeft() override; //move in the positive x direction
-    void moveUp() override; //move in the NEGATIVE y direction (screen space up!)
-    void moveDown() override; //move in the positive y direction
-    void moveDir(double x,double y) override; //move in a certain direction (magnitude is ignored)
-    void lookAt(double x,double y,bool showIcon=true) override; //look at the world coordinate x,y.
+    //move in the positive x direction
+    void moveRight() override; 
+    //move in the positive x direction
+    void moveLeft() override; 
+    //move in the NEGATIVE y direction (screen space up!)
+    void moveUp() override; 
+    //move in the positive y direction
+    void moveDown() override; 
+    //move in a certain direction (magnitude is ignored)
+    void moveDir(double x,double y) override; 
+    //look at the world coordinate x,y.
+    void lookAt(double x,double y,bool showIcon=true) override; 
     void attack() override;
     void block() override;
     void idle() override;
