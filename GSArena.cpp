@@ -1,14 +1,14 @@
 #include "GSArena.h"
 #include "Character.h"
+#include "Particles.h"
 #include "ArenaMap.h"
 
 using namespace std;
 
 CharMan::CharMan() : list(), currentlyControlled(-1) {}
 
-//Particles
+//list of particle effects
 ParticleList plist;
-
 
 void CharMan::removeChar(int toRemove) {
     Character &c=list[toRemove];
@@ -182,7 +182,10 @@ void GSArena::handleEvent(SDL_Event *e) {
         charman.switchControl();
 	else if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_k) {
         charman.killActiveCharacter();
-        charman.switchControl();
+		//test directional burst
+		std::cout << "charman: " << charman.getCurrentPosition() << std::endl;
+		plist.addDirectionalBurst(charman.getCurrentPosition(), 90, 15, 0.35f, 20, 10, 2, "media/team2spawn.png", .05f);
+		charman.switchControl();
 		if (charman.isGameOver()) {
 			gameOver = true;
 			//do gameOver rendering stuff somewhere TODO
@@ -190,7 +193,7 @@ void GSArena::handleEvent(SDL_Event *e) {
 	}
 	else if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_p) {
 
-		plist.addBurst(Vector2(5,10), 1, 20, 10, 2, "media/team2spawn.png");
+		plist.addBurst(Vector2(5,10), 1, 20, 10, 2, "media/team2spawn.png", .1f);
 	}
 
     if (!g.mouseCapturedByGUI) {

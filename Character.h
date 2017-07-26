@@ -9,6 +9,8 @@ class Character {
 
 protected: 
 
+	Vector2 pos;
+
     virtual Character* unsafe_copy() const =0;
 
     bool isdead; // true if the character is dead and should no longer be controlled by the player
@@ -18,7 +20,7 @@ protected:
 public:
     Sound deathSound;
 
-    Character();
+    Character(double x, double y);
 
 	//virtual Geometry *getGeometry()=0;
 	virtual void timestep(double dt,GSArena *gs)=0;
@@ -34,6 +36,7 @@ public:
     virtual void setPlayerControlled(bool arg);
     virtual void kill();
 
+	Vector2 getPosition() { return pos; }
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;
@@ -42,8 +45,7 @@ public:
 class TestCharacter : public Character {
     Vector2 acc;
     double accMagnitude;
-    Vector2 vel;
-    Vector2 pos;
+	Vector2 vel;
     double speedcap; // velocity cap
 
     Texture t;

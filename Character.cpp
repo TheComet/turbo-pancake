@@ -1,7 +1,7 @@
 #include "Character.h"
 #include "GSArena.h"
 
-Character::Character() : deathSound() ,isdead(false),shoulddelete(false),playercontrolled(false) { }
+Character::Character(double x, double y) : pos(x,y), deathSound() ,isdead(false),shoulddelete(false),playercontrolled(false) { }
 
 bool Character::isDead()  const { return isdead; }
 bool Character::shouldDelete()  const { return shoulddelete;  }
@@ -15,7 +15,7 @@ TestCharacter* TestCharacter::unsafe_copy() const{
     return new TestCharacter(*this);
 }
 
-TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(), acc(),accMagnitude(acceleration),vel(),pos(x,y),speedcap(velcap),t(img),controlled(false)  {
+TestCharacter::TestCharacter(double x,double y, float velcap, float acceleration, Texture img, Sound death) : Character(x,y), acc(),accMagnitude(acceleration),vel(),speedcap(velcap),t(img),controlled(false)  {
 	deathSound = death;
 }
 
