@@ -57,12 +57,16 @@ public:
     virtual void setPlayerControlled(bool arg);
     virtual void kill();
 
+    virtual bool isPushable();
 
     virtual Vector2 getPos()=0;
+    virtual void setPos(Vector2 pos)=0;
+    virtual double getCharacterRadius()=0;
 
     //So that CharacterList has access to unsafe_copy
     friend class CharacterList;
 };
+
 
 class TestCharacter : public Character {
     //so many variables that it's important to organize them correctly!
@@ -83,6 +87,7 @@ class TestCharacter : public Character {
     Vector2 acc;
     double accMagnitude;
     double speedcap; // velocity cap
+    double characterRadius;
 
     // ======================= Angle ======================= 
     //Angle in radians
@@ -109,6 +114,9 @@ class TestCharacter : public Character {
 public:
 	TestCharacter(double x=0,double y=0, float velcap=0, float acc=0, Texture img=Texture(), Sound death=Sound());
     Vector2 getPos() override;
+    void setPos(Vector2 pos) override;
+    bool isPushable() override;
+    double getCharacterRadius() override;
 
     void timestep(double dt, GSArena *gs) override;
 	void render(const Camera& arg) override;

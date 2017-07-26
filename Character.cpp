@@ -51,6 +51,8 @@ bool Character::isPlayerControlled() const { return playercontrolled; }
 void Character::setPlayerControlled(bool arg) { playercontrolled=arg; }
 void Character::kill() { setDead(true); setDelete(true); }
 
+bool Character::isPushable() { return false; }
+
 void Character::timestep(double dt,GSArena *gs) {
     if (isPlayerControlled()) {
         if (playerIsMovingUp)
@@ -103,6 +105,16 @@ void Character::handleEvent(SDL_Event *e,GSArena *gs) {
 Vector2 TestCharacter::getPos() {
     return pos;
 }
+void TestCharacter::setPos(Vector2 arg) {
+    pos=arg;
+}
+bool TestCharacter::isPushable() {
+    return true;
+}
+double TestCharacter::getCharacterRadius() {
+    return characterRadius;
+}
+
 void TestCharacter::moveRight() {
     acc.x+=accMagnitude;
     if (acc.length()>0)
@@ -143,7 +155,7 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     //sound initialization
     deathSound(),
     //movement initialization
-    pos(),vel(),acc(),accMagnitude(0),speedcap(0),
+    pos(),vel(),acc(),accMagnitude(0),speedcap(0),characterRadius(0),
     //angle initialization
     angle(0),targetAngle(0),lookSpeed(0),lastLookAt(0),
     //Attack initialization
@@ -163,6 +175,7 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     pos=Vector2(x,y);
     speedcap=velcap;
     accMagnitude=acceleration;
+    characterRadius=0.47;
 
     //angle
     lookSpeed=20;
@@ -193,7 +206,7 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
 
     //after final adjustments, move the character's coordinates
     pos+=vel*dt;
-    gs->map.circleMapCollide(pos,0.47);
+    gs->map.circleMapCollide(pos,characterRadius);
     acc=Vector2(); //the character does not keep accelerating unless moveLeft is constantly called.
 
 

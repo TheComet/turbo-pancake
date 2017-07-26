@@ -43,6 +43,26 @@ void CharMan::revokeCharacterControl() {
     }
 }
 
+void CharMan::handlePushableCollision() {
+    std::vector<Character*> pushables;
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if ((*it)->isPushable()) {
+            pushables.push_back(*it);
+        }
+    }
+    for (size_t i=0;i<pushables.size();i++) {
+        for (size_t j=i+1;j<pushables.size();j++) {
+            Vector2 ipos=pushables[i]->getPos();
+            double ir=pushables[i]->getCharacterRadius();
+            Vector2 jpos=pushables[j]->getPos();
+            double jr=pushables[j]->getCharacterRadius();
+            circleCirclePush(ipos,ir,jpos,jr);
+            pushables[i]->setPos(ipos);
+            pushables[j]->setPos(jpos);
+        }
+    }
+}
+
 void CharMan::addChar(const Character &arg, bool assignControl) {
     list.push_back(arg);
     Character &c=list[list.size()-1];
@@ -57,6 +77,7 @@ void CharMan::timestep(double dt,GSArena *const gs) {
     for (auto it = list.begin(); it != list.end(); it++) {
         (*it)->timestep(dt,gs);
     }
+    handlePushableCollision();
     handleDeletions();
 }
 

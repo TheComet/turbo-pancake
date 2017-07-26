@@ -30,6 +30,8 @@ class CharMan {
     //update list[currentlyControlled] to say it isn't character controlled and set 
     //currentlyControlled to -1.
     void revokeCharacterControl();
+
+    void handlePushableCollision();
 public:
     //Do nothing constructor
     CharMan();
