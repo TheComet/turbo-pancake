@@ -11,6 +11,7 @@ class Character {
 
 protected: 
 
+
     virtual Character* unsafe_copy() const =0;
 
     bool isdead; // true if the character is dead and should no longer be controlled by the player

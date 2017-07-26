@@ -59,6 +59,7 @@ public:
     bool isGameOver();
 };
 
+
 class GSArena
 {
     Button back;

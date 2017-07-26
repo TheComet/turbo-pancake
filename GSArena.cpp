@@ -1,11 +1,14 @@
 #include "GSArena.h"
 #include "Character.h"
+#include "Particles.h"
 #include "ArenaMap.h"
 
 using namespace std;
 
 CharMan::CharMan() : list(), currentlyControlled(-1) {}
 
+//list of particle effects
+ParticleList plist;
 
 void CharMan::removeChar(int toRemove) {
     Character &c=list[toRemove];
@@ -201,12 +204,14 @@ void GSArena::timestep(double dt) {
 
     camController.timestep(dt);
     charman.timestep(dt,this);
+	plist.timestep(dt, this);
 }
 void GSArena::render() {
     map.render(cam);
     charman.render(cam);
     back.render();
     resetButton.render();
+	plist.render(cam);
 }
 void GSArena::handleEvent(SDL_Event *e) {
     if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_PERIOD) {
@@ -215,12 +220,23 @@ void GSArena::handleEvent(SDL_Event *e) {
     }
 	else if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_k) {
         charman.killActiveCharacter();
-        charman.switchControl();
+		//test directional burst
+        Character *ch=charman.getActiveCharacter();
+        if (ch!=nullptr) {
+            charman.getActiveCharacter()->getPos();
+            std::cout << "charman: " << ch->getPos() << std::endl;
+            plist.addDirectionalBurst(ch->getPos(),90,15,0.35f,20,10,2,"media/team2spawn.png",.05f);
+        }
+		charman.switchControl();
         camController.centerTarget();
 		if (charman.isGameOver()) {
 			gameOver = true;
 			//do gameOver rendering stuff somewhere TODO
 		}
+	}
+	else if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_p) {
+
+		plist.addBurst(Vector2(5,10), 1, 20, 10, 2, "media/team2spawn.png", .1f);
 	}
 
     g.mouseCapturedByGUI=g.mouseCapturedByGUI||back.handleEvent(e);

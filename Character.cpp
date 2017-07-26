@@ -2,38 +2,6 @@
 #include "GSArena.h"
 
 
-/*
-class AngleEaser {
-    double target;
-    Vector2 point;
-    Vector2 easeexp(double dt) {
-        point=(point-target)*exp(-rate*dt)+target;
-        return point;
-    }
-    Vector2 easelinear(double dt) {
-        double c=cos(angle);
-        double s=sin(angle);
-        double ctarget=cos(targetAngle);
-        double starget=sin(targetAngle);
-        double c2=cos(angle+dt*lookSpeed);
-        double s2=sin(angle+dt*lookSpeed);
-        double d1=(c-ctarget)*(c-ctarget)+(s-starget)*(s-starget);
-        double d2=(c2-ctarget)*(c2-ctarget)+(s2-starget)*(s2-starget);
-        if (d1<0.1)
-            angle=targetAngle;
-        else if (d2<d1)
-            angle+=dt*lookSpeed;
-        else
-            angle-=dt*lookSpeed;
-        double d=(point-target).length();
-        if (d<rate*dt)
-            point=target;
-        else
-            point=point+(target-point)*rate*dt/d;
-        return point;
-    }
-};*/
-
 
 
 Character::Character() : isdead(false),shoulddelete(false),
@@ -184,6 +152,7 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     attackDuration=0.15;
     shieldpos=VectorEaser(Vector2(x,y),Vector2(x,y),40);
     swordpos=VectorEaser(Vector2(x,y),Vector2(x,y),40);
+
 }
 
 void TestCharacter::timestep(double dt, GSArena *gs) {
