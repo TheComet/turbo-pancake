@@ -76,7 +76,21 @@ public:
         return point;
     }
 };
-
+class AngleEaser {
+public:
+    double angle;
+    double target;
+    double rate;
+    AngleEaser() : angle(0),target(0),rate(0) { }
+    AngleEaser(double uangle,double utarget,double urate) : angle(uangle),target(utarget),rate(urate) { }
+    double easeexp(double dt) {
+        Vector2 cur(cos(angle),sin(angle));
+        Vector2 targ(cos(target),sin(target));
+        cur=(cur-targ)*exp(-rate*dt)+targ;
+        angle=atan2(cur.y,cur.x);
+        return angle;
+    }
+};
 
 
 

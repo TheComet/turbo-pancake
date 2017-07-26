@@ -149,7 +149,8 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     angle(0),targetAngle(0),lookSpeed(0),lastLookAt(0),
     //Attack initialization
     attackmode(AttackMode::idlestate),attackStarted(0),attackDuration(0),
-    shieldpos(),swordpos(),damage(1)
+    lastSwordBase(),lastSwordTip(),shieldangle(),swordangle(),
+    shieldpos(),swordpos(),damage(1),hitAnimation(-1)
 {
     //textures
     character=img;
@@ -173,11 +174,15 @@ TestCharacter::TestCharacter(double x,double y,float velcap,float acceleration,T
     attackDuration=0.15;
     shieldpos=VectorEaser(Vector2(x,y),Vector2(x,y),40);
     swordpos=VectorEaser(Vector2(x,y),Vector2(x,y),40);
+    shieldangle=AngleEaser(0,0,40);
+    swordangle=AngleEaser(0,0,40);
 
 }
 
 bool TestCharacter::dealDamage(double arg,Character *damageDealer,double invulnerabletime) {
     bool ret=Character::dealDamage(arg,damageDealer, invulnerabletime);
+    if (ret)
+        hitAnimation=invulnerabletime;
     if (health<0)
         kill();
     else if(health<5) {
@@ -242,20 +247,55 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
         }
     }
 
-    swordpos.easeexp(dt);
-    shieldpos.easeexp(dt);
+    double shieldAngleOffset=0,
+        shieldRadius=0,
+        swordAngleOffset=0,
+        swordTargetAngle=0,
+        swordRadius=0;
+    /* Update sword and shield target positions. */
+    if (attackmode==AttackMode::attackstate) {
+        shieldAngleOffset=60.0*M_PI/180.0;
+        shieldRadius=0.55;
+        double Deltat=(SDL_GetTicks()-attackStarted)*0.001;
+        swordAngleOffset=-60.0*M_PI/180.0 + Deltat/attackDuration*120*M_PI/180.0;
+        swordTargetAngle=swordAngleOffset+M_PI/2.0;
+        swordRadius=1;
+    }
+    else if (attackmode==AttackMode::blockstate) {
+        shieldAngleOffset=0;
+        shieldRadius=0.6;
+        swordAngleOffset=-110.0*M_PI/180.0;
+        swordTargetAngle=swordAngleOffset-M_PI/6.0;
+        swordRadius=0.4;
+    }
+    else if (attackmode==AttackMode::idlestate) {
+        shieldAngleOffset=60.0*M_PI/180.0;
+        shieldRadius=0.6;
+        swordAngleOffset=-60.0*M_PI/180.0;
+        swordTargetAngle=swordAngleOffset;
+        swordRadius=0.6;
+    }
+    double c1,s1;
+    c1=cos(angle+shieldAngleOffset);
+    s1=sin(angle+shieldAngleOffset);
+    shieldpos.target=Vector2(c1,s1)*shieldRadius;
+    shieldangle.target=shieldAngleOffset;
+    c2=cos(angle+swordAngleOffset);
+    s2=sin(angle+swordAngleOffset);
+    swordpos.target=Vector2(c2,s2)*swordRadius;
+    swordangle.target=swordTargetAngle;
+
+
+
+    Vector2 nextSwordTip=pos+swordpos.point+0.42*Vector2(-sin(angle+swordangle.angle),cos(angle+swordangle.angle));
+    Vector2 nextSwordBase=pos+swordpos.point- 0.29*Vector2(-sin(angle+swordangle.angle),cos(angle+swordangle.angle));
 
     if(attackmode==AttackMode::attackstate){
-        double Deltat=(SDL_GetTicks()-attackStarted)*0.001;
-        double swordoffset=60.0*M_PI/180.0 - Deltat/attackDuration*120*M_PI/180.0;
-        double c3=cos(angle-swordoffset);
-        double s3=sin(angle-swordoffset);
-        double xcoll=pos.x+swordpos.point.x-s3*1;
-        double ycoll=pos.y+swordpos.point.y+c3*1;
+        swordquad=Quadrilateral(lastSwordBase,lastSwordTip,nextSwordTip,nextSwordBase);
         CharacterList &cr=*(gs->charman.getChars());
         for (auto i=cr.begin();i!=cr.end();i++) {
-            if (doesCirclePointCollide((*i)->getPos(),(*i)->getCharacterRadius(),Vector2(xcoll,ycoll))) {
-                if ((*i)->dealDamage(damage,this)) {
+            if (doesCircleQuadCollide((*i)->getPos(),(*i)->getCharacterRadius(),swordquad)) {
+                if ((*i)!=this && (*i)->dealDamage(damage,this)) {
                     double x0 = rand() / (double)RAND_MAX -0.5;
                     double y0 = rand() / (double)RAND_MAX -0.5;
                     gs->plist.addTextParticle((*i)->getPos()+Vector2(x0,y0),0.35,{200,0,0},"Ow!!!!!");
@@ -263,14 +303,23 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
                 }
             }
         }
+
     }
+    hitAnimation-=dt;
+
+    lastSwordTip=nextSwordTip;
+    lastSwordBase=nextSwordBase;
+
+    swordpos.easeexp(dt);
+    shieldpos.easeexp(dt);
+    swordangle.easeexp(dt);
+    shieldangle.easeexp(dt);
 }
 void TestCharacter::attack() {
     if (attackmode==AttackMode::idlestate) {
         attackmode=AttackMode::attackstate;
         attackStarted=SDL_GetTicks();
     }
-
 }
 void TestCharacter::block() {
     if (attackmode==AttackMode::idlestate)
@@ -286,7 +335,10 @@ void TestCharacter::kill() { setDead(true); }
 
 
 void TestCharacter::render(const Camera& arg){
-    arg.renderTexture(character,pos.x,pos.y,0,1);
+    double hitoffset=0;
+    if(hitAnimation>0)
+        hitoffset=sin(hitAnimation*20*M_PI)*0.04;
+    arg.renderTexture(character,pos.x+hitoffset,pos.y,0,1);
 
     double timeSinceLook=(SDL_GetTicks()-lastLookAt)*0.001;
     double opacity=0.3;
@@ -302,6 +354,11 @@ void TestCharacter::render(const Camera& arg){
     double iconRadius=0.6;
     arg.renderTexture(directionIcon,pos.x,pos.y,180.0*angle/M_PI,2);
 
+
+    arg.renderTexture(shield,pos.x+shieldpos.point.x,pos.y+shieldpos.point.y,180.0*(angle+shieldangle.angle)/M_PI,0.6);
+    arg.renderTexture(sword,pos.x+swordpos.point.x,pos.y+swordpos.point.y,180.0*(angle+swordangle.angle)/M_PI,1);
+    
+    /*
     if (attackmode==AttackMode::attackstate) {
         double shieldoffset=60.0*M_PI/180.0;
         double shieldradius=0.55;
@@ -332,7 +389,6 @@ void TestCharacter::render(const Camera& arg){
         double s2=sin(angle-swordoffset);
         arg.renderTexture(sword,pos.x+swordpos.point.x,pos.y+swordpos.point.y,30+90+180.0*(angle)/M_PI-180,1);
         swordpos.target=Vector2(c2,s2)*swordradius;
-
     }
     else if (attackmode==AttackMode::idlestate) {
         double shieldoffset=60.0*M_PI/180.0;
@@ -348,7 +404,9 @@ void TestCharacter::render(const Camera& arg){
         double s2=sin(angle-swordoffset);
         arg.renderTexture(sword,pos.x+swordpos.point.x,pos.y+swordpos.point.y,30+90+180.0*(angle)/M_PI,1);
         swordpos.target=Vector2(c2,s2)*swordradius;
-    }
+    }*/
+
+    swordquad.render(arg);
 }
 
 

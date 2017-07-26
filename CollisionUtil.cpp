@@ -2,7 +2,9 @@
 #include "Globals.h"
 
 
+
 Line::Line() : p1(),p2() { }
+Line::Line(Vector2 a,Vector2 b) : p1(a),p2(b) { }
 Line::Line(double a,double b,double c,double d) : p1(a,b),p2(c,d) { }
 void Line::render(const Camera& c) const {
     Vector2 a=c.worldToPixels(p1);
@@ -25,9 +27,64 @@ double Rectangle::getWidth() { return x1-x0; }
 double Rectangle::getHeight() { return y1-y0; }
 void Rectangle::render(const Camera& c) { }
 
-bool doesCirclePointCollide(Vector2 &circlepos,double r,Vector2 point) {
+Quadrilateral::Quadrilateral() : p0(),p1(),p2(),p3() { }
+Quadrilateral::Quadrilateral(Vector2 a,Vector2 b,Vector2 c,Vector2 d) : p0(a),p1(b),p2(c),p3(d) { }
+void Quadrilateral::render(const Camera& cam) {
+    Vector2 a=cam.worldToPixels(p0);
+    Vector2 b=cam.worldToPixels(p1);
+    Vector2 c=cam.worldToPixels(p2);
+    Vector2 d=cam.worldToPixels(p3);
+    SDL_RenderDrawLine(g.renderer,(int)a.x,(int)a.y,(int)b.x,(int)b.y);
+    SDL_RenderDrawLine(g.renderer,(int)b.x,(int)b.y,(int)c.x,(int)c.y);
+    SDL_RenderDrawLine(g.renderer,(int)c.x,(int)c.y,(int)d.x,(int)d.y);
+    SDL_RenderDrawLine(g.renderer,(int)d.x,(int)d.y,(int)a.x,(int)a.y);
+}
+bool pnpoly(std::vector<Vector2> vert,Vector2 test)
+{
+    size_t nvert=vert.size();
+    size_t i,j=0;
+    bool c = false;
+    for (i = 0,j = nvert-1; i < nvert; j = i++) {
+        if (((vert[i].y>test.y) != (vert[j].y>test.y)) &&
+            (test.x < (vert[j].x-vert[i].x) * (test.y-vert[i].y) / (vert[j].y-vert[i].y) + vert[i].x))
+            c = !c;
+    }
+    return c;
+}
+
+bool doesCirclePointCollide(Vector2 circlepos,double r,Vector2 point) {
     return (circlepos-point).length()<r;
 }
+bool doesCircleLineCollide(Vector2 circlepos,double r,Line line) {
+    double t=0; Vector2 p=circlepos;
+    line.project(p,t); //populate the p and t values.
+    if (t<0) {
+        return doesCirclePointCollide(circlepos,r,line.p1);
+    }
+    else if (t>1) {
+        return doesCirclePointCollide(circlepos,r,line.p2);
+    }
+    else {
+        return doesCirclePointCollide(circlepos,r,p);
+    }
+}
+bool doesPointQuadCollide(Vector2 pointpos,Quadrilateral quad) {
+    std::vector<Vector2> lst;
+    lst.push_back(quad.p0);
+    lst.push_back(quad.p1);
+    lst.push_back(quad.p2);
+    lst.push_back(quad.p3);
+    return pnpoly(lst,pointpos);
+}
+bool doesCircleQuadCollide(Vector2 circlepos,double r,Quadrilateral quad) {
+    return doesPointQuadCollide(circlepos,quad)||
+        doesCircleLineCollide(circlepos,r,Line(quad.p0,quad.p1))||
+        doesCircleLineCollide(circlepos,r,Line(quad.p1,quad.p2))||
+        doesCircleLineCollide(circlepos,r,Line(quad.p2,quad.p3))||
+        doesCircleLineCollide(circlepos,r,Line(quad.p3,quad.p0));
+}
+
+
 //Pushes a circle so it is no longer intersect with a point. So (  .)  -> (   ). :)
 void circlePointCollide(Vector2 &circlepos,double r,Vector2 point) {
     Vector2 diff=circlepos-point;

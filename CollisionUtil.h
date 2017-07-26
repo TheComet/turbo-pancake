@@ -1,12 +1,15 @@
 #pragma once
 #include "Camera.h"
 #include "SDL.h"
+#include <iostream>
+#include <vector>
 
 /* Basic Line struct for collision management & debug collision geometry rendering. */
 struct Line {
     //p1 is the start point, p2 is the endpoint.
     Vector2 p1,p2;
     Line();
+    Line(Vector2 a,Vector2 b);
     Line(double a,double b,double c,double d);
     void render(const Camera& c) const;
     //Orthogonally projects p onto the line. p is set equal to (p2-p1)*t+p1 (linear interpolation). The 
@@ -22,8 +25,21 @@ struct Rectangle {
     double getHeight();
     void render(const Camera& c);
 };
+struct Quadrilateral {
+    Vector2 p0,p1,p2,p3;
+    Quadrilateral();
+    Quadrilateral(Vector2 a,Vector2 b,Vector2 c,Vector2 d);
+    void render(const Camera& c);
+};
 
-bool doesCirclePointCollide(Vector2 &circlepos,double r,Vector2 point);
+//https://wrf.ecse.rpi.edu//Research/Short_Notes/pnpoly.html
+//point in polygon test.
+bool pnpoly(std::vector<Vector2> vert,Vector2 test);
+
+bool doesPointQuadCollide(Vector2 pointpos,Quadrilateral quad);
+bool doesCircleQuadCollide(Vector2 circlepos,double r,Quadrilateral quad);
+bool doesCirclePointCollide(Vector2 circlepos,double r,Vector2 point);
+bool doesCircleLineCollide(Vector2 circlepos,double r,Line line);
 
 //Pushes a circle so it is no longer intersecting with a point. So (  .)  -> (   ). :)
 //Updates the value of circlepos to the new position.

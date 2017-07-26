@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include "Sound.h"
 #include <vector>
+#include "CollisionUtil.h"
 
 
 
@@ -111,6 +112,7 @@ class TestCharacter : public Character {
     //time since the character looked somewhere else.
     Uint32 lastLookAt;
 
+
     // ======================= Attack ======================= 
     enum AttackMode {
         idlestate,
@@ -119,9 +121,16 @@ class TestCharacter : public Character {
     }  attackmode;
     Uint32 attackStarted;
     double attackDuration;
+    Vector2 lastSwordBase;
+    Vector2 lastSwordTip;
+    AngleEaser shieldangle;
+    AngleEaser swordangle;
     VectorEaser shieldpos;
     VectorEaser swordpos;
+    Quadrilateral swordquad;
     double damage;
+
+    double hitAnimation;
 
     TestCharacter* unsafe_copy() const override;
 public:

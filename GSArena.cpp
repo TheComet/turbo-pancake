@@ -20,13 +20,8 @@ void CharMan::removeChar(int toRemove) {
 void CharMan::handleDeletions() {
     for (int i=0;i<(int)list.size();i++) {
         if (list[i].shouldDelete()){
-            //std::cout<<"Removing character "<<i<<". currentlyControlled is "<<currentlyControlled<<". list.size()="<<list.size()<<std::endl;
-
             removeChar(i);
-
-            //std::cout<<"Removed character "<<i<<". currentlyControlled is "<<currentlyControlled<<". list.size()="<<list.size()<<std::endl;
             i--;
-            
         }
     }
 }
