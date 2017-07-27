@@ -597,9 +597,15 @@ void Archer::timestep(double dt, GSArena *gs) {
 		arrowAngleOffset = -110.0*M_PI / 180.0;
 		swordTargetAngle = arrowAngleOffset - M_PI / 6.0;
 		swordRadius = 0.4;
+
+		//just spawn an arrow for now
+		Arrow a;
+		a.pos = pos;
+		a.vel = ARROW_SPEED * Vector2(cos(angle), sin(angle));
+		arrowList.push_back(a);
 	}
 	else if (attackmode == AttackMode::idlestate) {
-		bowAngleOffset = 60.0*M_PI / 180.0;
+		bowAngleOffset = M_PI/2;
 		shieldRadius = 0.6;
 		arrowAngleOffset = -60.0*M_PI / 180.0;
 		swordTargetAngle = arrowAngleOffset;
@@ -614,6 +620,43 @@ void Archer::timestep(double dt, GSArena *gs) {
 	s2 = sin(angle + arrowAngleOffset);
 	swordpos.target = Vector2(c2, s2)*swordRadius;
 	arrowangle.target = swordTargetAngle;
+
+	//Arrow in flight management!
+	auto it = arrowList.begin();
+	while (it != arrowList.end()) {
+		Vector2 flightoffset = it->vel*dt;
+		it->pos += flightoffset;
+		//move hitbox
+		it->hitbox.p0 = it->pos;
+		it->hitbox.p1 += flightoffset;
+		it->hitbox.p2 += flightoffset;
+		it->hitbox.p3 += flightoffset;
+
+		//fetch characters
+		CharacterList &cr = *(gs->charman.getChars());
+		for (auto i = cr.begin(); i != cr.end(); i++) {
+			//check collision
+			Vector2 charpos = (*i)->getPos();
+			if (doesCircleQuadCollide(charpos, (*i)->getCharacterRadius(), it->hitbox)) {
+				if ((*i) != this && (*i)->dealDamage(damage, this)) {
+					double x0 = rand() / (double)RAND_MAX - 0.5;
+					double y0 = rand() / (double)RAND_MAX - 0.5;
+					gs->plist.addTextParticle(charpos + Vector2(x0, y0), 0.35, { 200,0,0 }, "Ow!!!!!");
+					Vector2 bloodDirection = -1 * it->vel.normalized();
+					//just moving spawning of blood towards the outside of the character from the center
+					charpos += (*i)->getCharacterRadius() * .8 * bloodDirection;
+					gs->plist.addDirectionalBurst(charpos, atan2(-bloodDirection.y, bloodDirection.x), M_PI / 12, 0.3f, 6, 10, 0.3f, "media/team2spawn.png", .05f);;
+					//arrow has hit! time to remove.
+					it->canRemove = true;
+					break;
+				}
+			}
+		}
+		if (it->canRemove)
+			it = arrowList.erase(it);
+		else
+			++it;
+	}
 
 
 
@@ -693,6 +736,11 @@ void Archer::render(const Camera& arg) {
 
 	arg.renderTexture(bow, pos.x + shieldpos.point.x, pos.y + shieldpos.point.y, 180.0*(angle + bowangle.angle) / M_PI, 1.3);
 	arg.renderTexture(arrow, pos.x + swordpos.point.x, pos.y + swordpos.point.y, 180.0*(angle + arrowangle.angle) / M_PI, .7);
+
+	//render flying arrows
+	for(auto it = arrowList.begin(); it != arrowList.end(); ++it) {
+		arg.renderTexture(it->t, it->pos.x, it->pos.y, 0, it->size);
+	}
 
 	swordquad.render(arg);
 }

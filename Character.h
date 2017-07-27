@@ -198,6 +198,20 @@ class Archer : public Character {
 	//time since the character looked somewhere else.
 	Uint32 lastLookAt;
 
+	// ======================= Arrow ========================
+	struct Arrow {
+		Texture t = loadTexture("media/basic_arrow.png");
+		Vector2 pos;
+		double size = .7;
+		Vector2 vel;
+		bool canRemove = false;
+		Quadrilateral hitbox = Quadrilateral(pos,pos + size*Vector2(t.getWidth(),0), pos + size*Vector2(0,t.getHeight()), pos + size*Vector2(t.getWidth(),t.getHeight()));
+		double damage = 1;
+	};
+
+	#define ARROW_SPEED 10
+	std::vector<Arrow> arrowList;
+
 
 	// ======================= Attack ======================= 
 	enum AttackMode {

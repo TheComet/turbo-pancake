@@ -83,7 +83,6 @@ public:
     Stickers stickers;
     ParticleList plist;
 
-
     GSArena();
     void initialize();
     void reset();

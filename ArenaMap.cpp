@@ -15,6 +15,23 @@ void ArenaMap::circleMapCollide(Vector2 &circ,double r) {
         }
     }
 }
+
+//todo for arrow collision
+/*
+void ArenaMap::quadMapCollide(Quadrilateral &quad) {
+	int i = (int)circ.x;
+	int j = (int)circ.y;
+	for (int a = -1; a<2; a++) {
+		for (int b = -1; b<2; b++) {
+			if (isInBounds(i + a, j + b)) {
+				for (size_t c = 0; c<collisionGeometry[i + a][j + b].size(); c++) {
+					circleRectangleCollide(circ, r, collisionGeometry[i + a][j + b][c]);
+				}
+			}
+		}
+	}
+} */
+
 void ArenaMap::recalculateCollisionGeometry() {
     collisionGeometry=
         vector<vector<vector<Rectangle> > >(ntiles,
