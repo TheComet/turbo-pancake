@@ -1,7 +1,7 @@
 #include "Character.h"
 #include "GSArena.h"
 
-
+#define MAXHEALTH 10
 
 
 Character::Character() : isdead(false),shoulddelete(false),
@@ -9,7 +9,7 @@ playercontrolled(false),
 playerIsMovingUp(false),
 playerIsMovingDown(false),
 playerIsMovingRight(false),
-playerIsMovingLeft(false),health(10) { }
+playerIsMovingLeft(false),health(MAXHEALTH) { }
 
 bool Character::isDead()  const { return isdead; }
 bool Character::shouldDelete()  const { return shoulddelete;  }
@@ -185,8 +185,8 @@ bool TestCharacter::dealDamage(double arg,Character *damageDealer,double invulne
         hitAnimation=invulnerabletime;
     if (health<0)
         kill();
-    else if(health<5) {
-        character.setColor(255,(Uint8)(health*255/5),(Uint8)(health*255/5));
+    else if(health<MAXHEALTH/2) {
+        character.setColor(255,(Uint8)(health*255/(MAXHEALTH/2)),(Uint8)(health*255/(MAXHEALTH/2)));
     }
     return ret;
 }
@@ -294,11 +294,17 @@ void TestCharacter::timestep(double dt, GSArena *gs) {
         swordquad=Quadrilateral(lastSwordBase,lastSwordTip,nextSwordTip,nextSwordBase);
         CharacterList &cr=*(gs->charman.getChars());
         for (auto i=cr.begin();i!=cr.end();i++) {
-            if (doesCircleQuadCollide((*i)->getPos(),(*i)->getCharacterRadius(),swordquad)) {
+			Vector2 charpos = (*i)->getPos();
+            if (doesCircleQuadCollide(charpos,(*i)->getCharacterRadius(),swordquad)) {
                 if ((*i)!=this && (*i)->dealDamage(damage,this)) {
                     double x0 = rand() / (double)RAND_MAX -0.5;
                     double y0 = rand() / (double)RAND_MAX -0.5;
-                    gs->plist.addTextParticle((*i)->getPos()+Vector2(x0,y0),0.35,{200,0,0},"Ow!!!!!");
+                    gs->plist.addTextParticle(charpos+Vector2(x0,y0),0.35,{200,0,0},"Ow!!!!!");
+					//calculate direction to spray blood (just using beginning of sword tip for now, rather than checking for precise intersection
+					Vector2 bloodDirection = (lastSwordTip - charpos).normalized();
+					//just moving spawning of blood towards the outside of the character from the center
+					charpos += (*i)->getCharacterRadius() * .8 * bloodDirection;
+					gs->plist.addDirectionalBurst(charpos, atan2(-bloodDirection.y, bloodDirection.x), M_PI/12, 0.3f, 8, 10, 0.4f, "media/team2spawn.png", .05f);;
 
                 }
             }

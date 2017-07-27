@@ -110,7 +110,8 @@ public:
         Texture t = loadTexture(texpath);
 
 		for (int i = 0; i < numParticles; i++) {
-			double angle = ((rand() / (double)RAND_MAX * 2 * incidentangle) - incidentangle + initangle) * M_PI / 180.0;
+			// ANGLE IS IN RADIANS!
+			double angle = ((rand() / (double)RAND_MAX * 2 * incidentangle) - incidentangle + initangle);
 			double speed = rand() / (double)RAND_MAX * maxspeed;
 			double xv = speed * cos(angle);
 			double yv = speed * sin(-angle);

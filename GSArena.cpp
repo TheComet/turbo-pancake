@@ -221,7 +221,7 @@ void GSArena::handleEvent(SDL_Event *e) {
         Character *ch=charman.getActiveCharacter();
         if (ch!=nullptr) {
             std::cout << "charman: " << ch->getPos() << std::endl;
-            plist.addDirectionalBurst(ch->getPos(),90,15,0.35f,20,10,2,"media/team2spawn.png",.05f);
+            plist.addDirectionalBurst(ch->getPos(),M_PI/2,M_PI/12,0.35f,20,10,2,"media/team2spawn.png",.05f);
         }
 		charman.switchControl();
         camController.centerTarget();
