@@ -179,7 +179,7 @@ void GSArena::reset() {
     charman.addChar(TestCharacter(sp1[a].x,sp1[a].y,4,150,loadTexture("media/character.png"),Sound()),true);
     charman.addChar(TestCharacter(sp1[b].x,sp1[b].y,4,150,loadTexture("media/character.png"),Sound()));
     charman.addChar(TestCharacter(sp2[c].x,sp2[c].y,4,150,loadTexture("media/character.png"),Sound()));
-    charman.addChar(TestCharacter(sp2[d].x,sp2[d].y,4,150,loadTexture("media/character.png"),Sound()));
+    charman.addChar(Archer(sp2[d].x,sp2[d].y,4,150,loadTexture("media/character.png"),Sound()));
 }
 
 //Timestep. Calls timestep on the current active game state.

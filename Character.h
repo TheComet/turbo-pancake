@@ -166,6 +166,99 @@ public:
     friend class CharacterList;
 };
 
+
+class Archer : public Character {
+	//so many variables that it's important to organize them correctly!
+
+	// ======================= Textures ======================= 
+	Texture character;
+	Texture bow;
+	Texture arrow;
+	//Icon to display when the character looks somewhere else.
+	Texture directionIcon;
+
+	// ======================= Sounds ======================= 
+	Sound deathSound;
+
+	// ======================= Movement ======================= 
+	Vector2 pos;
+	Vector2 vel;
+	Vector2 acc;
+	double accMagnitude;
+	double speedcap; // velocity cap
+	double characterRadius;
+
+	// ======================= Angle ======================= 
+	//Angle in radians
+	double angle;
+	//Angle to look towards
+	double targetAngle;
+	//Angle to look towards
+	double lookSpeed;
+	//time since the character looked somewhere else.
+	Uint32 lastLookAt;
+
+
+	// ======================= Attack ======================= 
+	enum AttackMode {
+		idlestate,
+		attackstate,
+		blockstate
+	}  attackmode;
+	Uint32 attackStarted;
+	double attackDuration;
+	Vector2 lastSwordBase;
+	Vector2 lastSwordTip;
+	AngleEaser bowangle;
+	AngleEaser arrowangle;
+	VectorEaser shieldpos;
+	VectorEaser swordpos;
+	Quadrilateral swordquad;
+	double damage;
+
+	//wait a minute. what about arrows fired before death? should treat fired arrows independently of character?
+	struct FiredArrow {
+		Quadrilateral arrowquad;
+	};
+
+	double hitAnimation;
+
+	Archer* unsafe_copy() const override;
+public:
+	Archer(double x = 0, double y = 0, float velcap = 0, float acc = 0, Texture img = Texture(), Sound death = Sound());
+	Vector2 getPos() override;
+	void setPos(Vector2 pos) override;
+	bool isPushable() override;
+	double getCharacterRadius() override;
+
+	void timestep(double dt, GSArena *gs) override;
+	void render(const Camera& arg) override;
+
+
+	//move in the positive x direction
+	void moveRight() override;
+	//move in the positive x direction
+	void moveLeft() override;
+	//move in the NEGATIVE y direction (screen space up!)
+	void moveUp() override;
+	//move in the positive y direction
+	void moveDown() override;
+	//move in a certain direction (magnitude is ignored)
+	void moveDir(double x, double y) override;
+	//look at the world coordinate x,y.
+	void lookAt(double x, double y, bool showIcon = true) override;
+	void attack() override;
+	void block() override;
+	void idle() override;
+	void kill() override;
+	bool dealDamage(double arg, Character *damageDealer, double invulnerabletime = 0.15);
+
+	//So that CharacterList has access to unsafe_copy
+	friend class CharacterList;
+};
+
+
+
 class CharacterList {
 
     std::vector<Character *> list;
