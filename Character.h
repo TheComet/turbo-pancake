@@ -212,6 +212,7 @@ class Archer : public Character {
 
 	#define ARROW_SPEED 10
 	#define ARCHER_SPEED 700
+	#define ARROW_IMG_ROTATION 45
 	std::vector<Arrow> arrowList;
 
 
@@ -231,8 +232,9 @@ class Archer : public Character {
 	VectorEaser swordpos;
 	Quadrilateral swordquad;
 	double damage;
-	double archingTime; //how long since arrow fired?
-	double lastShotTime;
+	
+	Uint32 bowStarted;
+	bool shotThisAnimation;
 
 	//wait a minute. what about arrows fired before death? should treat fired arrows independently of character?
 	struct FiredArrow {

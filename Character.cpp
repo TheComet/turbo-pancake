@@ -480,7 +480,8 @@ angle(0), targetAngle(0), lookSpeed(0), lastLookAt(0),
 //Attack initialization
 attackmode(AttackMode::idlestate), attackStarted(0), attackDuration(0),
 lastSwordBase(), lastSwordTip(), bowangle(), arrowangle(),
-shieldpos(), swordpos(), damage(1), hitAnimation(-1), archingTime(ARCHER_SPEED), lastShotTime(0)
+shieldpos(), swordpos(), damage(1), hitAnimation(-1),
+bowStarted(0), shotThisAnimation(false)
 {
 	//textures
 	character = img;
@@ -576,6 +577,12 @@ void Archer::timestep(double dt, GSArena *gs) {
 			attackmode = AttackMode::idlestate;
 		}
 	}
+	else if (attackmode == AttackMode::blockstate) {
+		if (SDL_GetTicks() - bowStarted > ARCHER_SPEED) {
+			attackmode = AttackMode::idlestate;
+			shotThisAnimation = false;
+		}
+	}
 
 	double bowAngleOffset = 180,
 		shieldRadius = 0,
@@ -599,8 +606,8 @@ void Archer::timestep(double dt, GSArena *gs) {
 		swordRadius = 0.4;
 
 		//fire an arrow if we are past "reload" time
-		if (archingTime - lastShotTime >= ARCHER_SPEED) {
-			archingTime = 0;
+		if (!shotThisAnimation) {
+			shotThisAnimation = true;
 			Arrow a;
 			a.pos = pos;
 
@@ -613,16 +620,12 @@ void Archer::timestep(double dt, GSArena *gs) {
 			q.p1 = a.pos + Vector2(q.p1 * xoffset, q.p1 * yoffset);
 			q.p2 = a.pos + Vector2(q.p2 * xoffset, q.p2 * yoffset);
 			q.p3 = a.pos + Vector2(q.p3 * xoffset, q.p3 * yoffset);
-
-
-
 			a.hitbox = q;
+
 			a.vel = ARROW_SPEED * Vector2(cos(angle), sin(angle));
-			a.angle = angle;
+			a.angle = angle * 180 / M_PI + ARROW_IMG_ROTATION;
 			arrowList.push_back(a);
 		}
-		else
-			std::cout << "ran with arctime: " << archingTime << std::endl;
 	}
 	else if (attackmode == AttackMode::idlestate) {
 		bowAngleOffset = M_PI/2;
@@ -676,10 +679,6 @@ void Archer::timestep(double dt, GSArena *gs) {
 			it = arrowList.erase(it);
 		else
 			++it;
-
-		//will be set to 0 on arrow fire. just add more time until we can fire again
-		if (archingTime <= ARCHER_SPEED)
-			archingTime += dt; 
 	}
 
 
@@ -725,9 +724,10 @@ void Archer::attack() {
 	}
 }
 void Archer::block() {
-	if (attackmode == AttackMode::idlestate)
+	if (attackmode == AttackMode::idlestate) {
 		attackmode = AttackMode::blockstate;
-
+		bowStarted = SDL_GetTicks();
+	}
 }
 void Archer::idle() {
 	if (attackmode == AttackMode::blockstate)
