@@ -205,11 +205,13 @@ class Archer : public Character {
 		double size = .7;
 		Vector2 vel;
 		bool canRemove = false;
-		Quadrilateral hitbox = Quadrilateral(pos,pos + size*Vector2(t.getWidth(),0), pos + size*Vector2(0,t.getHeight()), pos + size*Vector2(t.getWidth(),t.getHeight()));
+		Quadrilateral hitbox;
 		double damage = 1;
+		double angle;
 	};
 
 	#define ARROW_SPEED 10
+	#define ARCHER_SPEED 700
 	std::vector<Arrow> arrowList;
 
 
@@ -229,6 +231,8 @@ class Archer : public Character {
 	VectorEaser swordpos;
 	Quadrilateral swordquad;
 	double damage;
+	double archingTime; //how long since arrow fired?
+	double lastShotTime;
 
 	//wait a minute. what about arrows fired before death? should treat fired arrows independently of character?
 	struct FiredArrow {

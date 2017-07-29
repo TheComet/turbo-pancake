@@ -480,7 +480,7 @@ angle(0), targetAngle(0), lookSpeed(0), lastLookAt(0),
 //Attack initialization
 attackmode(AttackMode::idlestate), attackStarted(0), attackDuration(0),
 lastSwordBase(), lastSwordTip(), bowangle(), arrowangle(),
-shieldpos(), swordpos(), damage(1), hitAnimation(-1)
+shieldpos(), swordpos(), damage(1), hitAnimation(-1), archingTime(ARCHER_SPEED), lastShotTime(0)
 {
 	//textures
 	character = img;
@@ -598,11 +598,31 @@ void Archer::timestep(double dt, GSArena *gs) {
 		swordTargetAngle = arrowAngleOffset - M_PI / 6.0;
 		swordRadius = 0.4;
 
-		//just spawn an arrow for now
-		Arrow a;
-		a.pos = pos;
-		a.vel = ARROW_SPEED * Vector2(cos(angle), sin(angle));
-		arrowList.push_back(a);
+		//fire an arrow if we are past "reload" time
+		if (archingTime - lastShotTime >= ARCHER_SPEED) {
+			archingTime = 0;
+			Arrow a;
+			a.pos = pos;
+
+			//set up hitbox
+			Vector2 offset = a.size * Vector2(0.01*a.t.getWidth(), 0.02*a.t.getHeight());
+			Quadrilateral q = Quadrilateral(-.5*offset, .5*Vector2(offset.x, -offset.y), .5*offset, .5*Vector2(-offset.x, offset.y));
+			Vector2 xoffset = Vector2(-sin(angle), cos(angle));
+			Vector2 yoffset = Vector2(cos(angle), sin(angle));
+			q.p0 = a.pos + Vector2(q.p0 * xoffset, q.p0 * yoffset);
+			q.p1 = a.pos + Vector2(q.p1 * xoffset, q.p1 * yoffset);
+			q.p2 = a.pos + Vector2(q.p2 * xoffset, q.p2 * yoffset);
+			q.p3 = a.pos + Vector2(q.p3 * xoffset, q.p3 * yoffset);
+
+
+
+			a.hitbox = q;
+			a.vel = ARROW_SPEED * Vector2(cos(angle), sin(angle));
+			a.angle = angle;
+			arrowList.push_back(a);
+		}
+		else
+			std::cout << "ran with arctime: " << archingTime << std::endl;
 	}
 	else if (attackmode == AttackMode::idlestate) {
 		bowAngleOffset = M_PI/2;
@@ -627,7 +647,7 @@ void Archer::timestep(double dt, GSArena *gs) {
 		Vector2 flightoffset = it->vel*dt;
 		it->pos += flightoffset;
 		//move hitbox
-		it->hitbox.p0 = it->pos;
+		it->hitbox.p0 += flightoffset;
 		it->hitbox.p1 += flightoffset;
 		it->hitbox.p2 += flightoffset;
 		it->hitbox.p3 += flightoffset;
@@ -656,6 +676,10 @@ void Archer::timestep(double dt, GSArena *gs) {
 			it = arrowList.erase(it);
 		else
 			++it;
+
+		//will be set to 0 on arrow fire. just add more time until we can fire again
+		if (archingTime <= ARCHER_SPEED)
+			archingTime += dt; 
 	}
 
 
@@ -739,7 +763,8 @@ void Archer::render(const Camera& arg) {
 
 	//render flying arrows
 	for(auto it = arrowList.begin(); it != arrowList.end(); ++it) {
-		arg.renderTexture(it->t, it->pos.x, it->pos.y, 0, it->size);
+		arg.renderTexture(it->t, it->pos.x, it->pos.y, it->angle, it->size);
+		it->hitbox.render(arg);
 	}
 
 	swordquad.render(arg);
